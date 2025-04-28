@@ -1,0 +1,81 @@
+body {
+  background-color: #e3f2fd; /* Light blue background for the outer area */
+  margin: 0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.loginContainer {
+  width: 80%;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #ffffff; /* White background for the login box */
+  border-radius: 15px; /* Slightly more rounded corners */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Stronger shadow for depth */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #90caf9; /* Light blue border */
+  border-radius: 8px; /* Rounded corners for input fields */
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+}
+
+input:focus {
+  outline: none;
+  border-color: #1e88e5; /* Vibrant blue border on focus */
+  box-shadow: 0 0 8px rgba(30, 136, 229, 0.5); /* Subtle blue glow effect */
+}
+
+button {
+  padding: 12px;
+  background-color: #1e88e5; /* Vibrant blue background for the button */
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded corners for the button */
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+button:hover {
+  background-color: #1565c0; /* Darker blue on hover */
+}
+
+.error {
+  color: #d32f2f; /* Red for error messages */
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.linkContainer {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.linkContainer a {
+  color: #1e88e5; /* Vibrant blue for links */
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s; /* Smooth transition */
+}
+
+.linkContainer a:hover {
+  color: #1565c0; /* Darker blue on hover */
+  text-decoration: underline;
+}

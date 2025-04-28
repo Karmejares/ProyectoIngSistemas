@@ -1,0 +1,136 @@
+.container {
+  background-color: #ffffff; /* White background for the checklist */
+  padding: 20px;
+  border-radius: 15px; /* Slightly more rounded corners */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Stronger shadow for depth */
+  max-width: 400px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  text-align: center;
+  color: #1e88e5; /* Vibrant blue for the heading */
+  margin-bottom: 20px;
+}
+
+.inputContainer {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #90caf9; /* Light blue border */
+  border-radius: 8px; /* Rounded corners for input fields */
+  font-size: 14px;
+  transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+}
+
+.input:focus {
+  outline: none;
+  border-color: #1e88e5; /* Vibrant blue border on focus */
+  box-shadow: 0 0 8px rgba(30, 136, 229, 0.5); /* Subtle blue glow effect */
+}
+
+.addButton {
+  padding: 12px;
+  background-color: #007bff; /* Vibrant blue background for the button */
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded corners for the button */
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.addButton:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.deleteModeContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.trashButton {
+  background-color: #ff4d4d; /* Red background for delete mode button */
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded corners for the button */
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.trashButton:hover {
+  background-color: #cc0000; /* Darker red on hover */
+}
+
+.deleteModeText {
+  color: #ff4d4d; /* Red text for delete mode */
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.goalList {
+  list-style: none;
+  padding: 0;
+}
+
+.goalItem {
+  display: flex;
+  align-items: center; /* Align checkbox and text vertically */
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px; /* Rounded corners for goal items */
+  margin-bottom: 10px;
+  background-color: #f9f9f9; /* Light grey background for goal items */
+  transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
+}
+
+.goalItem:hover {
+  transform: scale(1.02); /* Slight zoom effect on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+}
+
+.goalName {
+  font-size: 14px;
+  margin-left: 10px; /* Add spacing between checkbox and text */
+}
+
+.completedGoal {
+  font-size: 14px;
+  text-decoration: line-through;
+  color: #888; /* Grey color for completed goals */
+  margin-left: 10px; /* Add spacing between checkbox and text */
+}
+
+input[type="checkbox"] {
+  width: 20px; /* Increase the width */
+  height: 20px; /* Increase the height */
+  cursor: pointer;
+  accent-color: #007bff; /* Change checkbox color */
+}
+
+.deleteButton {
+  padding: 5px 10px;
+  background-color: #ff4d4d; /* Red background for delete button */
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded corners for the button */
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.deleteButton:hover {
+  background-color: #cc0000; /* Darker red on hover */
+}

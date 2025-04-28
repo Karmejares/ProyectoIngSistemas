@@ -1,0 +1,39 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent backdrop */
+  z-index: 10; /* Ensure it is below the modal but above other content */
+}
+
+.modal {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px 10px 0 0; /* Rounded corners at the top */
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 20; /* Ensure it is above the backdrop */
+  overflow-y: auto; /* Add scroll if content overflows */
+  max-height: 70vh; /* Prevent the modal from growing too tall */
+}
+
+.closeButton {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: #0056b3;
+}

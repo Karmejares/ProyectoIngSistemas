@@ -1,0 +1,39 @@
+.footer {
+  background-color: #1e88e5; /* Vibrant blue for the footer */
+  color: #90caf9; /* Light blue for the menu text (text-blue-200 equivalent) */
+  padding: 10px 0;
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #ccc;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 15; /* Ensure it is above the backdrop but below the modal */
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.footer h2 {
+  margin: 0;
+  font-size: 16px;
+  cursor: pointer;
+  color: #90caf9; /* Light blue for menu items */
+  transition: color 0.3s; /* Smooth transition for hover effect */
+  display: flex;
+  align-items: center; /* Align text and icons vertically */
+  gap: 8px; /* Add spacing between icon and text */
+}
+
+.footer h2:hover {
+  color: #e3f2fd; /* Even lighter blue on hover */
+}
+
+.footer h2:active {
+  color: #004d40; /* Darker teal for active state */
+}
+
+.icon {
+  font-size: 20px; /* Adjust icon size */
+}

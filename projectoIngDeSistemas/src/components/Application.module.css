@@ -1,0 +1,71 @@
+body {
+  background-color: #f0f4f8; /* Light blue-gray background for the outer area */
+  margin: 0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobileContainer {
+  width: 90%; /* Adjust width to fit within a mobile-like display */
+  max-width: 400px; /* Limit the width to a typical mobile screen size */
+  height: 100%; /* Full height for the mobile-like display */
+  background-color: #ffffff; /* White background for the app */
+  border-radius: 20px; /* Rounded corners for a mobile-like look */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+.mainContent {
+  flex: 1; /* Take up remaining space above the footer */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e3f2fd; /* Light blue background for the main content */
+}
+
+.petContainer {
+  width: 90%;
+  max-width: 300px;
+  height: 80%;
+  background-color: #ffffff; /* White background for the pet container */
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.petImage {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 10px;
+  display: block;
+  margin: auto;
+}
+
+.footer {
+  background-color: #1e88e5; /* Vibrant blue for the footer */
+  color: white;
+  padding: 10px 0;
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #ccc;
+}
+
+.footer h2 {
+  margin: 0;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.footer h2:hover {
+  color: #90caf9; /* Light blue hover effect */
+}
