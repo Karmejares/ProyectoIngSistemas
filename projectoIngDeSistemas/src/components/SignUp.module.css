@@ -19,6 +19,10 @@ form {
   flex-direction: column;
 }
 
+form button {
+  margin-bottom: 20px; /* Add spacing below the "Register" button */
+}
+
 label {
   margin-bottom: 5px;
   font-weight: bold;
@@ -41,6 +45,7 @@ input:focus {
 }
 
 button {
+  display: block;
   padding: 12px;
   background-color: #1e88e5; /* Vibrant blue background for the button */
   color: white;
@@ -89,4 +94,23 @@ p {
 .linkContainer a:hover {
   color: #1565c0; /* Darker blue on hover */
   text-decoration: underline;
+}
+
+.backButton {
+  display: block; /* Make the button behave like a block element */
+  margin: 1px auto 0; /* Center horizontally with auto and add spacing above */
+  padding: 12px;
+  background-color: #1e88e5; /* Vibrant blue */
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded corners */
+  cursor: pointer;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+  text-align: center; /* Ensure text inside the button is centered */
+  width: 100%;
+}
+
+.backButton:hover {
+  background-color: #1565c0; /* Darker blue on hover */
 }

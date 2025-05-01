@@ -1,5 +1,5 @@
 import classes from "./Application.module.css";
-import petImage from "../assets/imagen1.png";
+import petImage from "../assets/CutePixelatedCat.png";
 import MainFooter from "./MainFooter";
 
 function Application() {

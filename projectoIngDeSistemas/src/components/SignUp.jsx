@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { UserContext } from "./UserContext"; // Import UserContext
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import styles from "./SignUp.module.css";
 
 function SignUp() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
+    dob: "", // Add date of birth to the formData state
     password: "",
     confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { addUser } = useContext(UserContext); // Access the addUser function from context
+  const navigate = useNavigate(); // Initialize navigation
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -18,7 +23,12 @@ function SignUp() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!formData.username || !formData.email || !formData.password) {
+    if (
+      !formData.username ||
+      !formData.email ||
+      !formData.dob ||
+      !formData.password
+    ) {
       setError("All fields are required.");
       setSuccess("");
       return;
@@ -28,9 +38,28 @@ function SignUp() {
       setSuccess("");
       return;
     }
-    console.log("User registered:", formData);
+
+    // Add the new user to the global context
+    addUser({
+      username: formData.username,
+      email: formData.email,
+      dob: formData.dob, // Pass the date of birth to the context
+      password: formData.password,
+    });
+
     setError("");
     setSuccess("User registered successfully!");
+    setFormData({
+      username: "",
+      email: "",
+      dob: "",
+      password: "",
+      confirmPassword: "",
+    });
+  };
+
+  const handleBackToLogin = () => {
+    navigate("/"); // Navigate back to the login page
   };
 
   return (
@@ -53,6 +82,13 @@ function SignUp() {
           onChange={handleChange}
           placeholder="Enter your email"
         />
+        <label>Date of Birth:</label>
+        <input
+          type="date"
+          name="dob"
+          value={formData.dob}
+          onChange={handleChange}
+        />
         <label>Password:</label>
         <input
           type="password"
@@ -73,6 +109,9 @@ function SignUp() {
       </form>
       {error && <p className={styles.error}>{error}</p>}
       {success && <p className={styles.success}>{success}</p>}
+      <button className={styles.backButton} onClick={handleBackToLogin}>
+        Back to Log In
+      </button>
     </div>
   );
 }

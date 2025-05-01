@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "./UserContext"; // Import UserContext
 import classes from "./OptionsMenu.module.css";
 
 function OptionsMenu() {
   const navigate = useNavigate();
+  const { users, setUsers, isLoggedIn, logOutUser } = useContext(UserContext); // Access users and context functions
   const [timeLimit, setTimeLimit] = useState(""); // State to store the time limit
   const [timeExceeded, setTimeExceeded] = useState(false); // State to track if time is exceeded
 
   const handleLogout = () => {
     alert("You are now logged out!");
-    navigate("/"); // Redirect to the LogInBckgrd component
+    logOutUser(); // Log out the user
+    navigate("/"); // Redirect to the login page
   };
 
   const handleSetTimeLimit = (e) => {
@@ -26,8 +29,12 @@ function OptionsMenu() {
       "Are you sure you want to delete your account? This action cannot be undone."
     );
     if (confirmDelete) {
+      // Remove the logged-in user from the users array
+      const updatedUsers = users.filter((user) => user.isLoggedIn !== true);
+      setUsers(updatedUsers); // Update the users in the context
+      logOutUser(); // Log out the user
       alert("Your account has been deleted.");
-      navigate("/"); // Redirect to the login page after account deletion
+      navigate("/"); // Redirect to the login page
     }
   };
 

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "./UserContext";
 import classes from "./LogIn.module.css";
 
 function LogIn() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const { users, logInUser } = useContext(UserContext); // Access logInUser from context
   const navigate = useNavigate();
 
   const handleChange = (event) => {
@@ -14,8 +16,14 @@ function LogIn() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (formData.username === "James" && formData.password === "Moncada") {
-      navigate("/Application");
+    const userExists = users.some(
+      (user) =>
+        user.username === formData.username &&
+        user.password === formData.password
+    );
+    if (userExists) {
+      logInUser(); // Mark the user as logged in
+      navigate("/Application"); // Redirect to the application page
     } else {
       setError("Invalid username or password.");
     }

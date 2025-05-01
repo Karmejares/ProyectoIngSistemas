@@ -1,19 +1,30 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { UserProvider } from "./components/UserContext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LogIn from "./components/LogIn";
-import Application from "./components/Application";
 import SignUp from "./components/SignUp";
+import Application from "./components/Application";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LogIn />} />
-        <Route path="/Application" element={<Application />} />
-        <Route path="SignUp" element={<SignUp />} />
-      </Routes>
-    </Router>
+    <UserProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LogIn />} />
+          <Route path="/SignUp" element={<SignUp />} />
+          <Route
+            path="/Application"
+            element={
+              <ProtectedRoute>
+                <Application />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </UserProvider>
   );
 }
 

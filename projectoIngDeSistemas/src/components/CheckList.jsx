@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classes from "./CheckList.module.css";
 import { FaTrash } from "react-icons/fa"; // Import the trash icon from react-icons
 
 function CheckList() {
-  const [goals, setGoals] = useState([]);
+  const [goals, setGoals] = useState(() => {
+    // Load goals from localStorage when the component mounts
+    const savedGoals = localStorage.getItem("goals");
+    return savedGoals ? JSON.parse(savedGoals) : [];
+  });
   const [newGoal, setNewGoal] = useState("");
   const [deleteMode, setDeleteMode] = useState(false); // State to enable/disable delete mode
+
+  // Save goals to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("goals", JSON.stringify(goals));
+  }, [goals]);
 
   const handleAddGoal = () => {
     if (newGoal.trim() === "") return;
