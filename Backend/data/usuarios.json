@@ -1,0 +1,22 @@
+[
+  {
+    "id": "1",
+    "username": "James",
+    "password": "Moncada",
+    "timeLimit": "01:30", 
+    "privacySettings": {
+      "shareProfile": false,
+      "notifications": true
+    }
+  },
+  {
+    "id": "2",
+    "username": "Laura",
+    "password": "12345",
+    "timeLimit": "02:00",
+    "privacySettings": {
+      "shareProfile": true,
+      "notifications": false
+    }
+  }
+]
