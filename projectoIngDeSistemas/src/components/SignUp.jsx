@@ -36,7 +36,7 @@ function SignUp() {
     }
 
     // Make the fetch call to /auth/signup
-    fetch("http://localhost:3001/auth/signup", {
+    fetch("http://localhost:3001/api/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
