@@ -27,7 +27,6 @@ app.use('/api/goals', goalsRoutes);
 app.use('/api/store', storeRoutes);
 
 
-
-app.listen(8000, () => {
-  console.log("Servidor backend corriendo en http://localhost:8000");
+app.listen(3001, () => {
+  console.log("Servidor backend corriendo en http://localhost:3001");
 });
