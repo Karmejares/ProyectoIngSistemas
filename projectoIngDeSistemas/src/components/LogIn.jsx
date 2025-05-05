@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import classes from "./LogIn.module.css";
 
@@ -14,21 +14,45 @@ function LogIn() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const userExists = users.some(
-      (user) =>
-        user.username === formData.username &&
-        user.password === formData.password
-    );
-    if (userExists) {
-      logInUser(); // Mark the user as logged in
-      navigate("/Application"); // Redirect to the application page
-    } else {
-      setError("Invalid username or password.");
+    setError(""); // Clear previous errors
+
+    try {
+      const response = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+
+      if (response.status === 200) {
+        const data = await response.json();
+        const token = data.token;
+        localStorage.setItem("token", token);
+        logInUser()
+        navigate("/Application");
+        
+      }
+    } catch (err) {
+      setError(err.message);
+      console.log(err.message)
     }
   };
-
+  
+  // const userExists = users.some(
+  //   (user) =>
+  //     user.username === formData.username &&
+  //     user.password === formData.password
+  // );
+  
+  
   return (
     <div className={classes.body}>
       <div className={classes.loginContainer}>
@@ -59,3 +83,4 @@ function LogIn() {
 }
 
 export default LogIn;
+

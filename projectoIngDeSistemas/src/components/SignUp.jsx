@@ -23,32 +23,52 @@ function SignUp() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (
-      !formData.username ||
-      !formData.email ||
-      !formData.dob ||
-      !formData.password
-    ) {
+    if (!formData.username || !formData.email || !formData.password) {
       setError("All fields are required.");
       setSuccess("");
       return;
     }
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match.");
       setSuccess("");
       return;
     }
 
-    // Add the new user to the global context
-    addUser({
-      username: formData.username,
-      email: formData.email,
-      dob: formData.dob, // Pass the date of birth to the context
-      password: formData.password,
-    });
+    // Make the fetch call to /auth/signup
+    fetch("/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((err) => {
+            throw new Error(err.message || "Signup failed");
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (response.status === 200){
+          navigate("/");
+        }
+      })
+      
 
-    setError("");
-    setSuccess("User registered successfully!");
+      .catch((err) => {
+        // Handle errors
+        console.error("Error during signup:", err);
+        setError(err.message);
+        setSuccess("");
+      });
+
     setFormData({
       username: "",
       email: "",
@@ -56,6 +76,7 @@ function SignUp() {
       password: "",
       confirmPassword: "",
     });
+    
   };
 
   const handleBackToLogin = () => {
