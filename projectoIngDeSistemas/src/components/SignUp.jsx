@@ -36,7 +36,7 @@ function SignUp() {
     }
 
     // Make the fetch call to /auth/signup
-    fetch("/auth/signup", {
+    fetch("http://localhost:3001/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,19 +47,19 @@ function SignUp() {
         password: formData.password,
       }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          return response.json().then((err) => {
-            throw new Error(err.message || "Signup failed");
-          });
+          const err = await response.json()
+          throw new Error(err.message || "Signup failed");
         }
-        return response.json();
+        const data = await response.json()
+        return { response, data }
       })
-      .then((data) => {
-        if (response.status === 200){
-          navigate("/");
-        }
-      })
+      .then(({ response, data }) => {
+      if (response.status === 200) {
+        navigate("/");
+      }
+    })
       
 
       .catch((err) => {
