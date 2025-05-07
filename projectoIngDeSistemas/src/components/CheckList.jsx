@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import classes from "./CheckList.module.css";
 import { FaTrash } from "react-icons/fa"; // Import the trash icon from react-icons
+import { UserContext } from "./UserContext"; // Import UserContext
 
 function CheckList() {
+  const { addCoins } = useContext(UserContext); // Access addCoins from context
+
   const [goals, setGoals] = useState(() => {
     // Load goals from localStorage when the component mounts
     const savedGoals = localStorage.getItem("goals");
-    return savedGoals ? JSON.parse(savedGoals) : [];
+ return savedGoals ? JSON.parse(savedGoals).map(goal => ({ ...goal, frequency: goal.frequency || 'daily', history: goal.history || [] })) : [];
   });
   const [newGoal, setNewGoal] = useState("");
+  const [newGoalFrequency, setNewGoalFrequency] = useState('daily');
   const [deleteMode, setDeleteMode] = useState(false); // State to enable/disable delete mode
 
   // Save goals to localStorage whenever they change
@@ -18,8 +22,7 @@ function CheckList() {
 
   const handleAddGoal = () => {
     if (newGoal.trim() === "") return;
-    setGoals([...goals, { id: Date.now(), name: newGoal, completed: false }]);
-    setNewGoal("");
+    setGoals([...goals, { id: Date.now(), name: newGoal, completed: false, frequency: newGoalFrequency, history: [] }]);
   };
 
   const handleDeleteGoal = (id) => {
@@ -61,6 +64,14 @@ function CheckList() {
           onKeyDown={handleKeyDown}
           className={classes.input}
         />
+        <select
+          value={newGoalFrequency}
+          onChange={(e) => setNewGoalFrequency(e.target.value)}
+          className={classes.frequencySelect}
+        >
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+        </select>
         <button onClick={handleAddGoal} className={classes.addButton}>
           Add
         </button>

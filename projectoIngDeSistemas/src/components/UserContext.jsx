@@ -4,6 +4,7 @@ export const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [users, setUsers] = useState([]);
+  const [coins, setCoins] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
 
   const addUser = (user) => {
@@ -18,9 +19,17 @@ export function UserProvider({ children }) {
     setIsLoggedIn(false); // Log the user out
   };
 
+  const addCoins = (amount) => {
+    setCoins(prevCoins => prevCoins + amount);
+  };
+
+  const removeCoins = (amount) => {
+    setCoins(prevCoins => Math.max(0, prevCoins - amount));
+  };
+
   return (
     <UserContext.Provider
-      value={{ users, addUser, isLoggedIn, logInUser, logOutUser }}
+      value={{ users, addUser, isLoggedIn, logInUser, logOutUser, coins, addCoins, removeCoins }}
     >
       {children}
     </UserContext.Provider>

@@ -20,6 +20,16 @@ body {
   overflow: hidden; /* Prevent content overflow */
 }
 
+.coinDisplay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
 .mainContent {
   flex: 1; /* Take up remaining space above the footer */
   display: flex;
