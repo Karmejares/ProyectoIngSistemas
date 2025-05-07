@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { UserContext } from './UserContext';
 
 function Store() {
-  const { coins, removeCoins } = useContext(UserContext);
+  const { coins, removeCoins, feedPet } = useContext(UserContext);
   const catFoodItems = [
     { id: 1, name: 'Fish', price: 10 },
     { id: 2, name: 'Cookies', price: 5 },
@@ -29,6 +29,7 @@ function Store() {
   function handlePurchase(item) {
     if (coins >= item.price) {
       removeCoins(item.price);
+      feedPet(item.name);
       alert(`You purchased ${item.name} for ${item.price} coins!`);
     } else {
       alert('Not enough coins!');

@@ -29,7 +29,7 @@ export function UserProvider({ children }) {
 
   return (
     <UserContext.Provider
-      value={{ users, addUser, isLoggedIn, logInUser, logOutUser, coins, addCoins, removeCoins }}
+      value={{ users, addUser, isLoggedIn, logInUser, logOutUser, coins, addCoins, removeCoins, feedPet: () => {} }}
     >
       {children}
     </UserContext.Provider>
