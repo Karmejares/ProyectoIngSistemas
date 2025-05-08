@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import classes from "./MainFooter.module.css";
+import { AppBar, Toolbar, Button, Typography, Box } from "@mui/material";
 import Modal from "./Modal";
+
 import CheckList from "./CheckList";
 import OptionsMenu from "./OptionsMenu"; // Import the OptionsMenu component
 import Store from "./Store"; // Import the Store component
@@ -56,17 +57,51 @@ function MainFooter() {
           <Store />
         </Modal>
       )}
-      <footer className={classes.footer}>
-        <h2 onClick={openStoreModalHandler} style={{ cursor: "pointer" }}>
-          <FaStore className={classes.icon} /> Store
-        </h2>
-        <h2 onClick={openModalHandler} style={{ cursor: "pointer" }}>
-          <FaListAlt className={classes.icon} /> My Goals
-        </h2>
-        <h2 onClick={openOptionsModalHandler} style={{ cursor: "pointer" }}>
-          <FaCog className={classes.icon} /> Options
-        </h2>
-      </footer>
+      <AppBar
+        position="static"
+        sx={{ top: "auto", bottom: 0, backgroundColor: "#333" }}
+      >
+        <Toolbar sx={{ display: "flex", justifyContent: "space-around" }}>
+          <Button color="inherit" onClick={openStoreModalHandler}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <FaStore />
+              <Typography variant="caption">Store</Typography>
+            </Box>
+          </Button>
+
+          <Button color="inherit" onClick={openModalHandler}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <FaListAlt />
+              <Typography variant="caption">My Goals</Typography>
+            </Box>
+          </Button>
+
+          <Button color="inherit" onClick={openOptionsModalHandler}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <FaCog />
+              <Typography variant="caption">Options</Typography>
+            </Box>
+          </Button>
+        </Toolbar>
+      </AppBar>
     </>
   );
 }
