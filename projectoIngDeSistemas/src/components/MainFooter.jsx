@@ -9,10 +9,10 @@ import { FaStore, FaListAlt, FaCog } from "react-icons/fa"; // Import icons from
 function MainFooter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
 
   const openModalHandler = () => {
-  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
-    setIsModalOpen(true);
+   setIsModalOpen(true);
   };
 
   const closeModalHandler = () => {
