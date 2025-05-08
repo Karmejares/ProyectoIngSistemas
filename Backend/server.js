@@ -26,6 +26,10 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/goals', goalsRoutes);
 app.use('/api/store', storeRoutes);
 
+app.get('/', (req, res) => {
+  res.send('Backend server is running!');
+});
+
 
 app.listen(3001, () => {
   console.log("Servidor backend corriendo en http://localhost:3001");
