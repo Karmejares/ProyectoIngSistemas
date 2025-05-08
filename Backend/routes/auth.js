@@ -48,6 +48,7 @@ router.post("/signup", async (req, res) => {
     await fs.writeFile(usersFilePath, JSON.stringify(users));
     res.status(200).json({ success: true, message: "User created" });
   } catch (error) {
+    console.error("Error during signup:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
