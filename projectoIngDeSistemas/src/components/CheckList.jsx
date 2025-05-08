@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { FaListAlt } from "react-icons/fa"; // Import calendar icon
 
 import { UserContext } from "./UserContext"; // Import UserContext
@@ -454,34 +453,32 @@ function CheckList() {
                     }}
                   >
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DateCalendar
-                        date={null} // You might set a default date if needed
-                        onChange={() => {}} // No-op for visualization
-                        renderDay={(day, _value, DayComponentProps) => {
-                          const dateString = day.format("YYYY-MM-DD");
-                          const isCompleted = goal.history.includes(dateString);
-                          return (
-                            <div
-                              {...DayComponentProps.dayRenderElementProps}
-                              style={{
-                                backgroundColor: isCompleted
-                                  ? "lightblue"
-                                  : "transparent",
-                                borderRadius: "50%",
-                                width: "36px", // Adjust size as needed
-                                height: "36px", // Adjust size as needed
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                margin: "2px", // Adjust spacing
-                                cursor: "pointer", // Indicate clickable
-                              }}
-                            >
-                              {day.date()}
-                            </div>
-                          );
-                        }}
-                      />
+                      date={null}
+                      onChange={() => {}}
+                      {(day, _value, DayComponentProps) => {
+                        const dateString = day.format("YYYY-MM-DD");
+                        const isCompleted = goal.history.includes(dateString);
+                        return (
+                          <div
+                            {...DayComponentProps.dayRenderElementProps}
+                            style={{
+                              backgroundColor: isCompleted
+                                ? "lightblue"
+                                : "transparent",
+                              borderRadius: "50%",
+                              width: "36px", // Adjust size as needed
+                              height: "36px", // Adjust size as needed
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              margin: "2px", // Adjust spacing
+                              cursor: "pointer", // Indicate clickable
+                            }}
+                          >
+                            {day.date()}
+                          </div>
+                        );
+                      }}
                     </LocalizationProvider>
                   </Box>
                 </Box>
