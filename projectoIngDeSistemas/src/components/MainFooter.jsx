@@ -9,9 +9,9 @@ import { FaStore, FaListAlt, FaCog } from "react-icons/fa"; // Import icons from
 function MainFooter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
 
   const openModalHandler = () => {
-  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
     setIsModalOpen(true);
   };
 
@@ -52,13 +52,13 @@ function MainFooter() {
         </Modal>
       )}
       {isStoreModalOpen && (
- <Modal onClose={closeStoreModalHandler}>
- <Store />
- </Modal>
- )}
+        <Modal onClose={closeStoreModalHandler}>
+          <Store />
+        </Modal>
+      )}
       <footer className={classes.footer}>
         <h2 onClick={openStoreModalHandler} style={{ cursor: "pointer" }}>
- <FaStore className={classes.icon} /> Store
+          <FaStore className={classes.icon} /> Store
         </h2>
         <h2 onClick={openModalHandler} style={{ cursor: "pointer" }}>
           <FaListAlt className={classes.icon} /> My Goals
