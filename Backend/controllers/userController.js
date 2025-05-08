@@ -1,57 +1,79 @@
-const fs = require('fs');
-const path = require('path');
-
-const filePath = path.join(__dirname, '../data/users.json');
-
-function readUsers() {
-  const data = fs.readFileSync(filePath);
-  return JSON.parse(data);
-}
-
-function writeUsers(users) {
-  fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
-}
+const db = require('../data/db'); 
 
 exports.updateTimeLimit = (req, res) => {
   const { userId, timeLimit } = req.body;
-  const users = readUsers();
-  const user = users.find(u => u.id === userId);
 
-  if (!user) return res.status(404).json({ message: 'User not found' });
+  const query = 'UPDATE usuario SET time_limit = ? WHERE id = ?';
+  db.query(query, [timeLimit, userId], (err, result) => {
+    if (err) {
+      console.error('Error actualizando time limit:', err);
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
 
-  user.timeLimit = timeLimit;
-  writeUsers(users);
-  res.json({ message: 'Time limit updated' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({ message: 'Time limit actualizado correctamente' });
+  });
 };
 
-exports.updatePrivacy = (req, res) => {
+/*exports.updatePrivacy = (req, res) => {
   const { userId, privacy } = req.body;
-  const users = readUsers();
-  const user = users.find(u => u.id === userId);
 
-  if (!user) return res.status(404).json({ message: 'User not found' });
+  const query = 'UPDATE usuarios SET privacy = ? WHERE id = ?';
+  db.query(query, [privacy, userId], (err, result) => {
+    if (err) {
+      console.error('Error actualizando privacidad:', err);
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
 
-  user.privacy = privacy;
-  writeUsers(users);
-  res.json({ message: 'Privacy settings updated' });
-};
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({ message: 'Privacidad actualizada correctamente' });
+  });
+};*/
 
 exports.changePassword = (req, res) => {
   const { userId, newPassword } = req.body;
-  const users = readUsers();
-  const user = users.find(u => u.id === userId);
 
-  if (!user) return res.status(404).json({ message: 'User not found' });
+  console.log("Recibido en backend:", userId, newPassword);
 
-  user.password = newPassword;
-  writeUsers(users);
-  res.json({ message: 'Password updated successfully' });
+  if (!userId || !newPassword) {
+    return res.status(400).json({ message: 'Datos incompletos' });
+  }
+
+  const query = 'UPDATE usuario SET contrasena = ? WHERE id = ?';
+  db.query(query, [newPassword, userId], (err, result) => {
+    if (err) {
+      console.error('Error actualizando contraseña:', err);
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+  });
 };
 
 exports.deleteAccount = (req, res) => {
   const { userId } = req.body;
-  let users = readUsers();
-  users = users.filter(u => u.id !== userId);
-  writeUsers(users);
-  res.json({ message: 'Account deleted' });
+
+  const query = 'DELETE FROM usuario WHERE id = ?';
+  db.query(query, [userId], (err, result) => {
+    if (err) {
+      console.error('Error eliminando usuario:', err);
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json({ message: 'Cuenta eliminada correctamente' });
+  });
 };

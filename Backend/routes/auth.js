@@ -1,9 +1,8 @@
 const express = require('express');
-const fs = require("fs/promises");
-const path = require("path");
-
+const { loginUser, registerUser } = require('../controllers/authController');  
 const router = express.Router();
 
+<<<<<<< Updated upstream
 const usersFilePath = path.join(__dirname, '../data/usuarios.json');
 
 router.post("/login", async (req, res) => {
@@ -28,6 +27,10 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+=======
+router.post('/login', loginUser);
+router.post('/register', registerUser);
+>>>>>>> Stashed changes
 
 router.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
@@ -56,3 +59,4 @@ router.post("/signup", async (req, res) => {
 
 
 module.exports = router;
+

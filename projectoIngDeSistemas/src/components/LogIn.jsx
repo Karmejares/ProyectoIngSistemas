@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import classes from "./LogIn.module.css";
 
@@ -14,6 +15,7 @@ function LogIn() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleSubmit = async (event) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(""); // Clear previous errors

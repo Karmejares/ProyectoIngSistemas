@@ -21,7 +21,7 @@ function SignUp() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
     if (!formData.username || !formData.email || !formData.password) {
       setError("All fields are required.");
@@ -78,7 +78,7 @@ function SignUp() {
     });
     
   };
-
+*/
   const handleBackToLogin = () => {
     navigate("/"); // Navigate back to the login page
   };
