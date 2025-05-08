@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { UserContext } from "./UserContext"; // Import UserContext
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import styles from "./SignUp.module.css";
+import { TextField, Button } from "@mui/material";
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -84,47 +84,50 @@ function SignUp() {
   };
 
   return (
-    <div className={styles.container}>
+    <div>
       <h1>Sign Up</h1>
       <form onSubmit={handleSubmit}>
-        <label>Username:</label>
-        <input
+        <TextField
+          label="Username"
           type="text"
           name="username"
           value={formData.username}
           onChange={handleChange}
           placeholder="Enter your username"
+          fullWidth
+          margin="normal"
         />
-        <label>Email:</label>
-        <input
+        <TextField
+          label="Email"
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
           placeholder="Enter your email"
+          fullWidth
+          margin="normal"
         />
-        <label>Date of Birth:</label>
-        <input
+        <TextField
+          label="Date of Birth"
           type="date"
           name="dob"
           value={formData.dob}
           onChange={handleChange}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
-        <label>Password:</label>
-        <input
+        <TextField
+          label="Password"
           type="password"
           name="password"
           value={formData.password}
           onChange={handleChange}
           placeholder="Enter your password"
-        />
-        <label>Confirm Password:</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          placeholder="Confirm your password"
+          fullWidth
+          margin="normal"
         />
         <button type="submit">Register</button>
       </form>

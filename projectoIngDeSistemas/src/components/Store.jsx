@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { UserContext } from './UserContext';
+import { Typography, List, ListItem, Button, Box } from '@mui/material';
 
 function Store() {
   const { coins, removeCoins, feedPet } = useContext(UserContext);
@@ -13,17 +14,21 @@ function Store() {
   ];
 
   return (
-    <div className="store-container"> {/* Add a class for potential styling */}
-      <h2>Cat Food Store</h2>
-      <ul>
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h5" gutterBottom>
+        Cat Food Store
+      </Typography>
+      <List>
         {catFoodItems.map(item => (
-          <li key={item.id} className="store-item"> {/* Add a class for potential styling */}
-            {item.name} - {item.price} coins
-            <button onClick={() => handlePurchase(item)}>Buy</button>
-          </li>
+          <ListItem key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', py: 1 }}>
+            <Typography variant="body1">
+ {item.name} - {item.price} coins
+            </Typography>
+            <Button variant="contained" size="small" onClick={() => handlePurchase(item)}>Buy</Button>
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 
   function handlePurchase(item) {
