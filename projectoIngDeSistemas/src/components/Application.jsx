@@ -16,8 +16,6 @@ function Application() {
     }, 3000);
   };
   return (
-
-    <UserProvider feedPet={feedPet}>
       <div className={classes.mobileContainer}>
         <div className={classes.coinDisplay}>
           Coins: {coins}
@@ -29,7 +27,6 @@ function Application() {
         </div>
         <MainFooter />
       </div>
-    </UserProvider>
   );
 }
 
