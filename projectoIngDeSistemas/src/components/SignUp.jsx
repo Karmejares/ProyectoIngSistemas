@@ -1,13 +1,13 @@
 import React, { useState, useContext } from "react";
 import { UserContext } from "./UserContext"; // Import UserContext
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Typography, Box } from "@mui/material";
 
 function SignUp() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    dob: "", // Add date of birth to the formData state
+    dob: "",
     password: "",
     confirmPassword: "",
   });
@@ -49,19 +49,17 @@ function SignUp() {
     })
       .then(async (response) => {
         if (!response.ok) {
-          const err = await response.json()
+          const err = await response.json();
           throw new Error(err.message || "Signup failed");
         }
-        const data = await response.json()
-        return { response, data }
+        const data = await response.json();
+        return { response, data };
       })
       .then(({ response, data }) => {
-      if (response.status === 200) {
-        navigate("/");
-      }
-    })
-      
-
+        if (response.status === 200) {
+          navigate("/");
+        }
+      })
       .catch((err) => {
         // Handle errors
         console.error("Error during signup:", err);
@@ -76,7 +74,6 @@ function SignUp() {
       password: "",
       confirmPassword: "",
     });
-    
   };
 
   const handleBackToLogin = () => {
@@ -84,8 +81,19 @@ function SignUp() {
   };
 
   return (
-    <div>
-      <h1>Sign Up</h1>
+    <Box
+      sx={{
+        maxWidth: 400,
+        mx: "auto",
+        mt: 4,
+        p: 2,
+        border: "1px solid #ccc",
+        borderRadius: 2,
+      }}
+    >
+      <Typography variant="h4" component="h1" gutterBottom>
+        Sign Up
+      </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
           label="Username"
@@ -129,14 +137,46 @@ function SignUp() {
           fullWidth
           margin="normal"
         />
-        <button type="submit">Register</button>
+        <TextField
+          label="Confirm Password"
+          type="password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          placeholder="Confirm your password"
+          fullWidth
+          margin="normal"
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          Register
+        </Button>
       </form>
-      {error && <p className={styles.error}>{error}</p>}
-      {success && <p className={styles.success}>{success}</p>}
-      <button className={styles.backButton} onClick={handleBackToLogin}>
+      {error && (
+        <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      )}
+      {success && (
+        <Typography variant="body2" color="success.main" sx={{ mt: 2 }}>
+          {success}
+        </Typography>
+      )}
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={handleBackToLogin}
+        fullWidth
+        sx={{ mt: 2 }}
+      >
         Back to Log In
-      </button>
-    </div>
+      </Button>
+    </Box>
   );
 }
 
