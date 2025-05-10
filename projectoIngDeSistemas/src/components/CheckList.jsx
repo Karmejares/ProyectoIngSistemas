@@ -113,19 +113,23 @@ function CheckList() {
   };
 
   const calculateStreak = (goal) => {
-    const today = new Date().toISOString().slice(0, 10);
-    const sortedHistory = [...goal.history].sort();
-    let streak = 0;
+ if (!goal.history || goal.history.length === 0) {
+ return 0;
+ }
 
-    for (let i = sortedHistory.length - 1; i >= 0; i--) {
-      if (
-        sortedHistory[i] === today ||
-        sortedHistory[i] === new Date(today).toISOString().slice(0, 10)
-      ) {
-        streak++;
-        today.setDate(today.getDate() - 1);
-      } else {
-        break;
+    // Convert date strings to Date objects and sort them
+    const sortedDates = goal.history.map(dateString => new Date(dateString)).sort((a, b) => a - b);
+
+    let currentStreak = 0;
+    // Iterate backwards from the most recent date
+ for (let i = sortedDates.length - 1; i >= 0; i--) {
+      const currentDate = sortedDates[i];
+      const previousDate = sortedDates[i - 1];
+
+ if (i === sortedDates.length - 1 || (previousDate && currentDate.getDate() === previousDate.getDate() + 1 && currentDate.getMonth() === previousDate.getMonth() && currentDate.getFullYear() === previousDate.getFullYear())) {
+ currentStreak++;
+ } else if (previousDate && (currentDate.getDate() !== previousDate.getDate() + 1 || currentDate.getMonth() !== previousDate.getMonth() || currentDate.getFullYear() !== previousDate.getFullYear())) {
+ break; // Streak broken
       }
     }
 
@@ -210,7 +214,7 @@ function CheckList() {
         </Button>
       </Box>
 
-      {/* Display error message if there's an error */}
+ {/* Display error message if there's an error */}
       {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
     </Box>
   );
