@@ -102,11 +102,12 @@ const GoalList = ({
                   <DateCalendar
                     disableFuture
                     renderDay={(day, _value, DayComponentProps) => {
+                      const { renderDay, ...other } = DayComponentProps;
                       const dateString = day.format("YYYY-MM-DD");
                       const isCompleted = goal.history.includes(dateString);
                       return (
                         <div
-                          {...DayComponentProps}
+                          {...other}
                           style={{
                             backgroundColor: isCompleted && !deleteMode
                               ? "lightblue"
