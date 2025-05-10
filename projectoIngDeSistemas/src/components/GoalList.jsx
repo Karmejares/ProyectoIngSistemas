@@ -102,7 +102,7 @@ const GoalList = ({
                   <DateCalendar
                     disableFuture
                     renderDay={(day, _value, DayComponentProps) => {
-                      const { renderDay, ...other } = DayComponentProps;
+                      const date = day.toDate(); // Get Date object
                       const dateString = day.format("YYYY-MM-DD");
                       const isCompleted = goal.history.includes(dateString);
                       return (
@@ -110,7 +110,7 @@ const GoalList = ({
                           {...other}
                           style={{
                             backgroundColor: isCompleted && !deleteMode
-                              ? "lightblue"
+                              ? "red"
                               : "transparent",
                             borderRadius: "50%",
                             width: "36px",
@@ -120,7 +120,7 @@ const GoalList = ({
                             justifyContent: "center",
                             margin: "2px",
 
-                            cursor: "pointer",
+                            cursor: deleteMode ? "default" : "pointer",
                           }}
                         >
                           {day.date()}
