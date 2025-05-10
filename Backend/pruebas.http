@@ -1,0 +1,24 @@
+### Crear una nueva meta (goal)
+POST http://localhost:3001/api/goals
+Content-Type: application/json
+
+{
+  "descripcion": "Beber 8 vasos de agua",
+  "completada": false,
+  "checklist_id": 1,
+  "frecuencia_tipo": "custom",
+  "dias_custom": ["Monday", "Wednesday", "Friday"]
+}
+
+###
+
+### Obtener todas las metas para un checklist específico
+GET http://localhost:3001/api/goals/checklist/1
+
+###
+GET  http://localhost:3001/api/goals/user/1
+### Actualizar una meta existente
+
+
+### Eliminar una meta
+DELETE http://localhost:3001/api/goals/5

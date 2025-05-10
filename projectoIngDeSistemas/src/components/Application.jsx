@@ -2,7 +2,7 @@ import classes from "./Application.module.css";
 import petImage from "../assets/CutePixelatedCat.png";
 import MainFooter from "./MainFooter";
 import { useContext } from "react";
-import { useState, } from "react";
+import { useState } from "react";
 import { UserContext } from "./UserContext";
 
 function Application() {
@@ -16,20 +16,15 @@ function Application() {
     }, 3000);
   };
   return (
-
-    <UserProvider feedPet={feedPet}>
-      <div className={classes.mobileContainer}>
-        <div className={classes.coinDisplay}>
-          Coins: {coins}
+    <div className={classes.mobileContainer}>
+      <div className={classes.coinDisplay}>Coins: {coins}</div>
+      <div className={classes.mainContent}>
+        <div className={classes.petContainer}>
+          <img src={petImage} alt="Pet" className={classes.petImage} />
         </div>
-        <div className={classes.mainContent}>
-          <div className={classes.petContainer}>
-            <img src={petImage} alt="Pet" className={classes.petImage} />
-          </div>
-        </div>
-        <MainFooter />
       </div>
-    </UserProvider>
+      <MainFooter />
+    </div>
   );
 }
 

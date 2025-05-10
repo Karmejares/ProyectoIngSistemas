@@ -1,9 +1,8 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
-import { Link, useNavigate, Navigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
-import classes from "./LogIn.module.css";
-
+import { TextField, Button } from "@mui/material";
+ 
 function LogIn() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
@@ -15,7 +14,6 @@ function LogIn() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (event) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(""); // Clear previous errors
@@ -56,27 +54,31 @@ function LogIn() {
   
   
   return (
-    <div className={classes.body}>
-      <div className={classes.loginContainer}>
+    <div>
+      <div>
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
+          <TextField
+ label="Username"
+ type="text"
             name="username"
-            placeholder="Username"
             value={formData.username}
             onChange={handleChange}
+ fullWidth
+ margin="normal"
           />
-          <input
-            type="password"
+          <TextField
+ label="Password"
+ type="password"
             name="password"
-            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
+ fullWidth
+ margin="normal"
           />
-          <button type="submit">Sign In</button>
+          <Button type="submit" variant="contained" color="primary">Sign In</Button>
         </form>
-        {error && <p className={classes.error}>{error}</p>}
-        <div className={classes.linkContainer}>
+        {error && <p>{error}</p>}
+        <div>
           <Link to="/SignUp">Don't have an account? Sign Up</Link>
         </div>
       </div>
@@ -84,5 +86,5 @@ function LogIn() {
   );
 }
 
-export default LogIn;
 
+export default LogIn;

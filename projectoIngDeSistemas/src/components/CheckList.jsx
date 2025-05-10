@@ -1,115 +1,183 @@
-import React, { useState, useEffect, useContext } from "react";
-import classes from "./CheckList.module.css";
-import { FaTrash } from "react-icons/fa"; // Import the trash icon from react-icons
-import { UserContext } from "./UserContext"; // Import UserContext
+import React, { useState } from "react";
+import {
+  Box,
+  Grid,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import GoalList from "./GoalList"; // Import the GoalList component
 
 function CheckList() {
-  const { addCoins } = useContext(UserContext); // Access addCoins from context
-
-  const [goals, setGoals] = useState(() => {
-    // Load goals from localStorage when the component mounts
-    const savedGoals = localStorage.getItem("goals");
- return savedGoals ? JSON.parse(savedGoals).map(goal => ({ ...goal, frequency: goal.frequency || 'daily', history: goal.history || [] })) : [];
-  });
+  const [goals, setGoals] = useState([]);
   const [newGoal, setNewGoal] = useState("");
-  const [newGoalFrequency, setNewGoalFrequency] = useState('daily');
-  const [deleteMode, setDeleteMode] = useState(false); // State to enable/disable delete mode
+  const [newGoalFrequency, setNewGoalFrequency] = useState("daily");
+  const [customFrequencyDetails, setCustomFrequencyDetails] = useState([]);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [visibleCalendars, setVisibleCalendars] = useState({});
 
-  // Save goals to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("goals", JSON.stringify(goals));
-  }, [goals]);
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   const handleAddGoal = () => {
-    if (newGoal.trim() === "") return;
-    setGoals([...goals, { id: Date.now(), name: newGoal, completed: false, frequency: newGoalFrequency, history: [] }]);
+    if (!newGoal) return;
+
+    const newGoalObject = {
+      id: Date.now(),
+      name: newGoal,
+      frequency:
+        newGoalFrequency === "custom" ? customFrequencyDetails : "daily",
+      history: [],
+    };
+
+    setGoals([...goals, newGoalObject]);
+    setNewGoal("");
+    setCustomFrequencyDetails([]);
   };
 
-  const handleDeleteGoal = (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this goal?"
+  const handleDaySelect = (day) => {
+    setCustomFrequencyDetails((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     );
-    if (confirmDelete) {
-      setGoals(goals.filter((goal) => goal.id !== id));
-    }
   };
 
   const handleToggleGoal = (id) => {
-    setGoals(
-      goals.map((goal) =>
-        goal.id === id ? { ...goal, completed: !goal.completed } : goal
+    const today = new Date().toISOString().slice(0, 10);
+    setGoals((prevGoals) =>
+      prevGoals.map((goal) =>
+        goal.id === id
+          ? {
+              ...goal,
+              history: goal.history.includes(today)
+                ? goal.history.filter((date) => date !== today)
+                : [...goal.history, today],
+            }
+          : goal
       )
     );
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddGoal();
-    }
+  const handleDeleteGoal = (id) => {
+    setGoals((prevGoals) => prevGoals.filter((goal) => goal.id !== id));
+  };
+
+  const toggleCalendarVisibility = (id) => {
+    setVisibleCalendars((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   const toggleDeleteMode = () => {
-    setDeleteMode((prevMode) => !prevMode);
+    setDeleteMode((prev) => !prev);
+  };
+
+  const calculateStreak = (goal) => {
+    const today = new Date().toISOString().slice(0, 10);
+    const sortedHistory = [...goal.history].sort();
+    let streak = 0;
+
+    for (let i = sortedHistory.length - 1; i >= 0; i--) {
+      if (
+        sortedHistory[i] === today ||
+        sortedHistory[i] === new Date(today).toISOString().slice(0, 10)
+      ) {
+        streak++;
+        today.setDate(today.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    return streak;
   };
 
   return (
-    <div className={classes.container}>
-      <div className={classes.inputContainer}>
-        <input
-          type="text"
-          placeholder="Add a new goal"
-          value={newGoal}
-          onChange={(e) => setNewGoal(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className={classes.input}
+    <Box sx={{ padding: 2 }}>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs>
+          <TextField
+            fullWidth
+            type="text"
+            placeholder="Add a new goal"
+            value={newGoal}
+            onChange={(e) => setNewGoal(e.target.value)}
+            label="Add a new goal"
+            size="small"
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Select
+            fullWidth
+            value={newGoalFrequency}
+            onChange={(e) => setNewGoalFrequency(e.target.value)}
+            size="small"
+          >
+            <MenuItem value="daily">Daily</MenuItem>
+            <MenuItem value="custom">Custom</MenuItem>
+          </Select>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" onClick={handleAddGoal}>
+            Add
+          </Button>
+        </Grid>
+      </Grid>
+
+      {newGoalFrequency === "custom" && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="subtitle1" gutterBottom>
+            Select days:
+          </Typography>
+          <Grid container spacing={1}>
+            {daysOfWeek.map((day) => (
+              <Grid item key={day}>
+                <Button
+                  variant={
+                    customFrequencyDetails.includes(day)
+                      ? "contained"
+                      : "outlined"
+                  }
+                  onClick={() => handleDaySelect(day)}
+                  size="small"
+                >
+                  {day.slice(0, 3)}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
+
+      <Box sx={{ mt: 2 }}>
+        <GoalList
+          goals={goals}
+          deleteMode={deleteMode}
+          handleToggleGoal={handleToggleGoal}
+          handleDeleteGoal={handleDeleteGoal}
+          toggleCalendarVisibility={toggleCalendarVisibility}
+          visibleCalendars={visibleCalendars}
+          calculateStreak={calculateStreak}
         />
-        <select
-          value={newGoalFrequency}
-          onChange={(e) => setNewGoalFrequency(e.target.value)}
-          className={classes.frequencySelect}
+        <Button
+          onClick={toggleDeleteMode}
+          variant="outlined"
+          color="secondary"
+          sx={{ mt: 2 }}
         >
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-        </select>
-        <button onClick={handleAddGoal} className={classes.addButton}>
-          Add
-        </button>
-      </div>
-      <div className={classes.deleteModeContainer}></div>
-      <ul className={classes.goalList}>
-        {goals.map((goal) => (
-          <li key={goal.id} className={classes.goalItem}>
-            <label>
-              <input
-                type="checkbox"
-                checked={goal.completed}
-                onChange={() => handleToggleGoal(goal.id)}
-                disabled={deleteMode} // Disable checkbox in delete mode
-              />
-              <span
-                className={
-                  goal.completed ? classes.completedGoal : classes.goalName
-                }
-              >
-                {goal.name}
-              </span>
-            </label>
-            {deleteMode && (
-              <button
-                onClick={() => handleDeleteGoal(goal.id)}
-                className={classes.deleteButton}
-              >
-                Delete
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-      <button onClick={toggleDeleteMode} className={classes.trashButton}>
-        <FaTrash />
-      </button>
-    </div>
+          {deleteMode ? "Exit Delete Mode" : "Delete Goals"}
+        </Button>
+      </Box>
+    </Box>
   );
 }
 

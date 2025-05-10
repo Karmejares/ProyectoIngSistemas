@@ -58,6 +58,8 @@ CREATE TABLE META (
     descripcion VARCHAR(255),
     completada BOOLEAN DEFAULT FALSE,
     checklist_id INT NOT NULL,
+    frecuencia_tipo VARCHAR(20) NOT NULL DEFAULT 'daily',
+    dias_custom json DEFAULT NULL,
     FOREIGN KEY (checklist_id) REFERENCES CHECKLIST(id) ON DELETE CASCADE
 );
 

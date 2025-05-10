@@ -1,23 +1,9 @@
-const express = require('express');
-const { getGoals, storeGoals } = require('../data/goals');
-
+const express = require("express");
 const router = express.Router();
+const {createGoal,getGoalsByChecklist,updateGoal,getGoalsByUsuario} = require("../controllers/goalController");
 
-router.get('/', async (req, res) => {
-  const goals = await getGoals();
-  res.json({ goals });
-});
-
-router.post('/', async (req, res) => {
-  const existingGoals = await getGoals();
-  const goalsData = req.body;
-  const newGoals = {
-    ...goalsData,
-    id: Math.random().toString(),
-  };
-  const updatedGoals = [newGoals, ...existingGoals];
-  await storeGoals(updatedGoals);
-  res.status(201).json({ message: 'Goals creado.', goals: newGoals });
-});
+router.post("/", createGoal); //Crea una meta
+router.get("/checklist/:checklist_id", getGoalsByChecklist); // Trae una meta por el id
+router.get("/user/:usuario_id", getGoalsByUsuario);// Trae metas por usuario
 
 module.exports = router;

@@ -1,15 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-<<<<<<< Updated upstream
-=======
 const cors = require("cors");
 const dotenv = require('dotenv');
 
 
 dotenv.config();
->>>>>>> Stashed changes
 
-const cors = require("cors");
 
 const optionsRoutes = require("./routes/options");
 const usuariosRoutes = require("./routes/usuarios");
@@ -18,28 +14,27 @@ const storeRoutes = require("./routes/store");
 const authRoutes = require("./routes/auth");
 
 
-
-
 const app = express();
 
 app.use(cors());
+app.use(express.json()); // Necesario para leer req.body
+
 app.use(bodyParser.json());
 
 
 // Rutas
 
-app.use('/api/options', optionsRoutes);
+//app.use('/api/options', optionsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/goals', goalsRoutes);
-app.use('/api/store', storeRoutes);
+//app.use('/api/store', storeRoutes);
+
+app.get('/', (req, res) => {
+  res.send('Backend server is running!');
+});
 
 
-<<<<<<< Updated upstream
 app.listen(3001, () => {
-=======
-
-app.listen(8000, () => {
->>>>>>> Stashed changes
   console.log("Servidor backend corriendo en http://localhost:3001");
 });

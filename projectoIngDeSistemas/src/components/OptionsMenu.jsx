@@ -6,7 +6,6 @@ import classes from "./OptionsMenu.module.css";
 function OptionsMenu() {
   const navigate = useNavigate();
   
-  const userId = currentUser?.id;
   const { currentUser, logOutUser } = useContext(UserContext); // Usamos currentUser en lugar de users[]
   const [timeLimit, setTimeLimit] = useState("");
   const [timeExceeded, setTimeExceeded] = useState(false);
@@ -40,11 +39,12 @@ function OptionsMenu() {
   
   
   const handleChangePassword = async () => {
+    const userId = 1;
     const newPassword = prompt("Enter new password:");
     console.log("Datos enviados:", { userId, newPassword });
 
     try {
-      const response = await fetch("http://localhost:8000/api/usuarios/change-password", {
+      const response = await fetch("http://localhost:3001/api/usuarios/change-password", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, newPassword }),
@@ -64,7 +64,7 @@ function OptionsMenu() {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch("http://localhost:8000/api/user/delete-account", {
+      const response = await fetch("http://localhost:3001/api/user/delete-account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
@@ -86,7 +86,7 @@ function OptionsMenu() {
     if (!newPrivacy) return;
 
     try {
-      const response = await fetch("http://localhost:8000/api/user/update-privacy", {
+      const response = await fetch("http://localhost:3001/api/user/update-privacy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, privacy: newPrivacy }),
