@@ -20,6 +20,7 @@ const GoalList = ({
   handleDeleteGoal,
   toggleCalendarVisibility,
   visibleCalendars,
+ handleCalendarDayClick,
   calculateStreak,
 }) => {
   return (
@@ -107,7 +108,7 @@ const GoalList = ({
                         <div
                           {...DayComponentProps}
                           style={{
-                            backgroundColor: isCompleted
+                            backgroundColor: isCompleted && !deleteMode
                               ? "lightblue"
                               : "transparent",
                             borderRadius: "50%",
@@ -117,6 +118,7 @@ const GoalList = ({
                             alignItems: "center",
                             justifyContent: "center",
                             margin: "2px",
+
                             cursor: "pointer",
                           }}
                         >

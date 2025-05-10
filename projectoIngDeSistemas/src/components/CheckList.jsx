@@ -7,6 +7,7 @@ import {
   Select,
   MenuItem,
   Typography,
+  Alert, // Import Alert for potential error messages
 } from "@mui/material";
 import GoalList from "./GoalList"; // Import the GoalList component
 
@@ -17,6 +18,7 @@ function CheckList() {
   const [customFrequencyDetails, setCustomFrequencyDetails] = useState([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [visibleCalendars, setVisibleCalendars] = useState({});
+  const [error, setError] = useState(null); // State for error handling
 
   const daysOfWeek = [
     "Monday",
@@ -64,6 +66,35 @@ function CheckList() {
           : goal
       )
     );
+  };
+
+  const handleCalendarDayClick = async (goalId, date) => {
+    setError(null); // Clear previous errors
+    try {
+      const response = await fetch(`/api/goals/${goalId}/complete`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ completionDate: date }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update goal completion.");
+      }
+
+      // Update the frontend state after successful backend update
+      setGoals((prevGoals) =>
+        prevGoals.map((goal) =>
+          goal.id === goalId && !goal.history.includes(date)
+            ? { ...goal, history: [...goal.history, date] }
+            : goal
+        )
+      );
+    } catch (error) {
+      console.error("Error updating goal completion:", error);
+      setError("Failed to update goal completion. Please try again."); // Set error state
+    }
   };
 
   const handleDeleteGoal = (id) => {
@@ -167,6 +198,7 @@ function CheckList() {
           toggleCalendarVisibility={toggleCalendarVisibility}
           visibleCalendars={visibleCalendars}
           calculateStreak={calculateStreak}
+          handleCalendarDayClick={handleCalendarDayClick} // Pass the new handler
         />
         <Button
           onClick={toggleDeleteMode}
@@ -177,6 +209,9 @@ function CheckList() {
           {deleteMode ? "Exit Delete Mode" : "Delete Goals"}
         </Button>
       </Box>
+
+      {/* Display error message if there's an error */}
+      {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
     </Box>
   );
 }
