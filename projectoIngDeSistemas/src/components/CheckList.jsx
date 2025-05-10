@@ -133,7 +133,7 @@ function CheckList() {
       }
     }
 
-    return streak;
+    return currentStreak;
   };
 
   return (
