@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -19,6 +19,21 @@ function CheckList({ goals, setGoals }) {
   const [visibleCalendars, setVisibleCalendars] = useState({});
   const [error, setError] = useState(null); // State for error handling
 
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/api/goals");
+        const data = await response.json();
+        setGoals(data.goals);
+      } catch (error) {
+        console.error("Error fetching goals:", error);
+        setError("Failed to fetch goals. Please try again.");
+      }
+    };
+
+    fetchGoals();
+  }, []);
+
   const daysOfWeek = [
     "Monday",
     "Tuesday",
@@ -29,7 +44,7 @@ function CheckList({ goals, setGoals }) {
     "Sunday",
   ];
 
-  const handleAddGoal = () => {
+  const handleAddGoal = async () => {
     if (!newGoal) return;
 
     const newGoalObject = {
@@ -40,9 +55,27 @@ function CheckList({ goals, setGoals }) {
       history: [],
     };
 
-    setGoals([...goals, newGoalObject]);
-    setNewGoal("");
-    setCustomFrequencyDetails([]);
+    try {
+      const response = await fetch("http://localhost:3001/api/goals", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newGoalObject),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add goal.");
+      }
+
+      // Update the frontend state after successful backend update
+      setGoals((prevGoals) => [...prevGoals, newGoalObject]);
+      setNewGoal("");
+      setCustomFrequencyDetails([]);
+    } catch (error) {
+      console.error("Error adding goal:", error);
+      setError("Failed to add goal. Please try again.");
+    }
   };
 
   const handleDaySelect = (day) => {
@@ -51,30 +84,46 @@ function CheckList({ goals, setGoals }) {
     );
   };
 
-  const handleToggleGoal = (id) => {
-    const today = new Date();
-    const dateString = today.toISOString().slice(0, 10);
+  const handleToggleGoal = async (goalId) => {
+    const today = new Date().toISOString().slice(0, 10); // Get today's date in YYYY-MM-DD format
 
-    // Optimistically update the UI
- setGoals(prevGoals =>
- prevGoals.map(goal =>
- goal.id === id
- ? {
- ...goal,
- history: goal.history.includes(dateString)
- ? goal.history.filter(date => date !== dateString)
- : [...goal.history, dateString],
- }
- : goal
- )
- );
+    setGoals((prevGoals) =>
+      prevGoals.map((goal) => {
+        if (goal.id === goalId) {
+          const updatedHistory = goal.history.includes(today)
+            ? goal.history.filter((date) => date !== today) // Remove today's date
+            : [...goal.history, today]; // Add today's date
 
-    // Call the backend API to update the history
- fetch(`/api/goals/${id}/complete`, {
- method: 'PUT',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ completionDate: dateString }),
-  });
+          // Optionally, send the updated goal to the backend
+          updateGoalOnBackend({ ...goal, history: updatedHistory });
+
+          return { ...goal, history: updatedHistory }; // Update the goal's history
+        }
+        return goal;
+      })
+    );
+  };
+
+  // Function to send the updated goal to the backend
+  const updateGoalOnBackend = async (updatedGoal) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/goals/${updatedGoal.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedGoal),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update goal on the backend.");
+      }
+    } catch (error) {
+      console.error("Error updating goal on the backend:", error);
+    }
   };
 
   const handleCalendarDayClick = async (goalId, date) => {
@@ -111,6 +160,16 @@ function CheckList({ goals, setGoals }) {
   };
 
   const toggleCalendarVisibility = (id) => {
+    setGoals((prevGoals) =>
+      prevGoals.map((goal) =>
+        goal.id === id
+          ? { ...goal, isCalendarVisible: !goal.isCalendarVisible }
+          : goal
+      )
+    );
+  };
+
+  const handleToggleCalendarVisibility = (id) => {
     setVisibleCalendars((prev) => ({
       ...prev,
       [id]: !prev[id],
@@ -122,27 +181,22 @@ function CheckList({ goals, setGoals }) {
   };
 
   const calculateStreak = (goal) => {
- if (!goal.history || goal.history.length === 0) {
- return 0;
- }
+    const today = new Date(); // Keep `today` as a Date object
+    var todayString = today.toISOString().slice(0, 10); // Use this for comparisons
+    const sortedHistory = [...goal.history].sort(); // Ensure history is sorted
+    let streak = 0;
 
-    // Convert date strings to Date objects and sort them
-    const sortedDates = goal.history.map(dateString => new Date(dateString)).sort((a, b) => a - b);
-
-    let currentStreak = 0;
-    // Iterate backwards from the most recent date
- for (let i = sortedDates.length - 1; i >= 0; i--) {
-      const currentDate = sortedDates[i];
-      const previousDate = sortedDates[i - 1];
-
- if (i === sortedDates.length - 1 || (previousDate && currentDate.getDate() === previousDate.getDate() + 1 && currentDate.getMonth() === previousDate.getMonth() && currentDate.getFullYear() === previousDate.getFullYear())) {
- currentStreak++;
- } else if (previousDate && (currentDate.getDate() !== previousDate.getDate() + 1 || currentDate.getMonth() !== previousDate.getMonth() || currentDate.getFullYear() !== previousDate.getFullYear())) {
- break; // Streak broken
+    for (let i = sortedHistory.length - 1; i >= 0; i--) {
+      if (sortedHistory[i] === todayString) {
+        streak++;
+        today.setDate(today.getDate() - 1); // Move to the previous day
+        todayString = today.toISOString().slice(0, 10); // Update the comparison string
+      } else {
+        break;
       }
     }
 
-    return currentStreak;
+    return streak;
   };
 
   return (
@@ -212,6 +266,7 @@ function CheckList({ goals, setGoals }) {
           visibleCalendars={visibleCalendars}
           calculateStreak={calculateStreak}
           handleCalendarDayClick={handleCalendarDayClick} // Pass the new handler
+          handleToggleCalendarVisibility={handleToggleCalendarVisibility} // Pass the new handler
         />
         <Button
           onClick={toggleDeleteMode}
@@ -223,8 +278,12 @@ function CheckList({ goals, setGoals }) {
         </Button>
       </Box>
 
- {/* Display error message if there's an error */}
-      {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+      {/* Display error message if there's an error */}
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
     </Box>
   );
 }

@@ -18,9 +18,8 @@ const GoalList = ({
   deleteMode,
   handleToggleGoal,
   handleDeleteGoal,
-  toggleCalendarVisibility,
+  handleToggleCalendarVisibility,
   visibleCalendars,
-  handleCalendarDayClick,
   calculateStreak,
 }) => {
   return (
@@ -80,7 +79,7 @@ const GoalList = ({
           </Typography>
           <Button
             size="small"
-            onClick={() => toggleCalendarVisibility(goal.id)}
+            onClick={() => handleToggleCalendarVisibility(goal.id)} // Use the correct handler
             sx={{ mt: 0.5 }}
           >
             <FaListAlt style={{ marginRight: 4 }} /> History
@@ -101,14 +100,26 @@ const GoalList = ({
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateCalendar
                     disableFuture
-                    renderDay={(day, _value, DayComponentProps) => {
+                    renderDay={(day, value, DayComponentProps) => {
                       const dateString = day.format("YYYY-MM-DD");
                       const isCompleted = goal.history.includes(dateString);
+                      const isSelected = value && day.isSame(value, "day");
+
+                      // console.log(
+                      //   "Rendering day:",
+                      //   dateString,
+                      //   "isCompleted:",
+                      //   isCompleted
+                      // ); // Debugging
+
                       return (
                         <div
+                          {...DayComponentProps}
                           style={{
                             backgroundColor: isCompleted
-                              ? "red"
+                              ? "lightblue"
+                              : isSelected
+                              ? "lightgreen"
                               : "transparent",
                             borderRadius: "50%",
                             width: "36px",

@@ -7,9 +7,8 @@ import OptionsMenu from "./OptionsMenu"; // Import the OptionsMenu component
 import Store from "./Store"; // Import the Store component
 import { FaStore, FaListAlt, FaCog } from "react-icons/fa"; // Import icons from react-icons
 
-function MainFooter() {
+function MainFooter({ goals, setGoals }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [goals, setGoals] = useState([]);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
 
@@ -40,14 +39,14 @@ function MainFooter() {
   useEffect(() => {
     const fetchGoals = async () => {
       try {
-        const response = await fetch('/api/goals');
+        const response = await fetch("/api/goals");
         if (!response.ok) {
-          throw new Error('Failed to fetch goals');
+          throw new Error("Failed to fetch goals");
         }
         const data = await response.json();
-        setGoals(data);
+        setGoals(data); // Ensure `data` is an array of goals
       } catch (error) {
-        console.error('Error fetching goals:', error);
+        console.error("Error fetching goals:", error);
       }
     };
     fetchGoals();
