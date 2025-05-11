@@ -126,7 +126,7 @@ router.put("/:id", async (req, res) => {
     goals[goalIndex] = updatedGoal; // Update the goal
     console.log("Updated goal:", updatedGoal); // Log the updated goal
 
-    await saveGoals(goals); // Save the updated goals to the file
+    await storeGoals(goals); // Save the updated goals to the file
     res.json({ message: "Goal updated successfully", goal: updatedGoal });
   } catch (error) {
     console.error("Error updating goal:", error); // Log any errors

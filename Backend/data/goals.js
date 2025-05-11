@@ -11,9 +11,9 @@ async function getGoals() {
     if (!fileData) {
       return []; // Return an empty array if the file is empty
     }
-    const savedGoals = JSON.parse(fileData);
-    console.log("Parsed goals:", savedGoals);
-    return savedGoals;
+    const storedGoals = JSON.parse(fileData);
+    console.log("Parsed goals:", storedGoals);
+    return storedGoals;
   } catch (error) {
     console.error("Error in getGoals:", error);
     if (error.code === "ENOENT") {
@@ -33,5 +33,5 @@ async function storeGoals(goals) {
 
 module.exports = {
   getGoals,
-  savedGoals,
+  storeGoals,
 };
