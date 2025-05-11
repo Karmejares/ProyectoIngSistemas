@@ -20,7 +20,7 @@ const GoalList = ({
   handleDeleteGoal,
   toggleCalendarVisibility,
   visibleCalendars,
- handleCalendarDayClick,
+  handleCalendarDayClick,
   calculateStreak,
 }) => {
   return (
@@ -102,14 +102,12 @@ const GoalList = ({
                   <DateCalendar
                     disableFuture
                     renderDay={(day, _value, DayComponentProps) => {
-                      const date = day.toDate(); // Get Date object
                       const dateString = day.format("YYYY-MM-DD");
                       const isCompleted = goal.history.includes(dateString);
                       return (
                         <div
-                          {...other}
                           style={{
-                            backgroundColor: isCompleted && !deleteMode
+                            backgroundColor: isCompleted
                               ? "red"
                               : "transparent",
                             borderRadius: "50%",
@@ -119,8 +117,7 @@ const GoalList = ({
                             alignItems: "center",
                             justifyContent: "center",
                             margin: "2px",
-
-                            cursor: deleteMode ? "default" : "pointer",
+                            cursor: "pointer",
                           }}
                         >
                           {day.date()}

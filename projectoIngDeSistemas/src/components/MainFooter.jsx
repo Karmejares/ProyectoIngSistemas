@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Button, Typography, Box } from "@mui/material";
 import Modal from "./Modal";
 
@@ -9,6 +9,7 @@ import { FaStore, FaListAlt, FaCog } from "react-icons/fa"; // Import icons from
 
 function MainFooter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [goals, setGoals] = useState([]);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
 
@@ -36,6 +37,22 @@ function MainFooter() {
     setIsStoreModalOpen(false);
   };
 
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const response = await fetch('/api/goals');
+        if (!response.ok) {
+          throw new Error('Failed to fetch goals');
+        }
+        const data = await response.json();
+        setGoals(data);
+      } catch (error) {
+        console.error('Error fetching goals:', error);
+      }
+    };
+    fetchGoals();
+  }, []); // Empty dependency array means this effect runs only once after the initial render
+
   return (
     <>
       {isModalOpen && (
@@ -44,7 +61,7 @@ function MainFooter() {
           <p style={{ fontSize: "16px" }}>
             Here you can define and track your goals!
           </p>
-          <CheckList />
+          <CheckList goals={goals} setGoals={setGoals} />
         </Modal>
       )}
       {isOptionsModalOpen && (

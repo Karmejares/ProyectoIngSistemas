@@ -11,8 +11,7 @@ import {
 } from "@mui/material";
 import GoalList from "./GoalList"; // Import the GoalList component
 
-function CheckList() {
-  const [goals, setGoals] = useState([]);
+function CheckList({ goals, setGoals }) {
   const [newGoal, setNewGoal] = useState("");
   const [newGoalFrequency, setNewGoalFrequency] = useState("daily");
   const [customFrequencyDetails, setCustomFrequencyDetails] = useState([]);
@@ -53,19 +52,29 @@ function CheckList() {
   };
 
   const handleToggleGoal = (id) => {
-    const today = new Date().toISOString().slice(0, 10);
-    setGoals((prevGoals) =>
-      prevGoals.map((goal) =>
-        goal.id === id
-          ? {
-              ...goal,
-              history: goal.history.includes(today)
-                ? goal.history.filter((date) => date !== today)
-                : [...goal.history, today],
-            }
-          : goal
-      )
-    );
+    const today = new Date();
+    const dateString = today.toISOString().slice(0, 10);
+
+    // Optimistically update the UI
+ setGoals(prevGoals =>
+ prevGoals.map(goal =>
+ goal.id === id
+ ? {
+ ...goal,
+ history: goal.history.includes(dateString)
+ ? goal.history.filter(date => date !== dateString)
+ : [...goal.history, dateString],
+ }
+ : goal
+ )
+ );
+
+    // Call the backend API to update the history
+ fetch(`/api/goals/${id}/complete`, {
+ method: 'PUT',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ completionDate: dateString }),
+  });
   };
 
   const handleCalendarDayClick = async (goalId, date) => {
