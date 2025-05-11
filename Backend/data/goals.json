@@ -15,12 +15,12 @@
     "history": []
   },
   {
-    "id": 1,
+    "id": "1",
     "name": "Learn Node.js",
     "history": []
   },
   {
-    "id": 2,
+    "id": "2",
     "name": "Build a REST API",
     "history": []
   }
