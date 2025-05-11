@@ -1,5 +1,5 @@
 const express = require('express');
-const { getGoals, storeGoals } = require('../data/goals');
+const { getGoals, savedGoals } = require('../data/goals');
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
     id: Math.random().toString(),
   };
   const updatedGoals = [newGoals, ...existingGoals];
-  await storeGoals(updatedGoals);
+  await savedGoals(updatedGoals);
   res.status(201).json({ message: 'Goals creado.', goals: newGoals });
 });
 
@@ -39,7 +39,7 @@ router.put('/:id/complete', async (req, res) => {
   const goalToUpdate = updatedGoals[goalIndex];
   goalToUpdate.history = goalToUpdate.history ? [...goalToUpdate.history, completionDate] : [completionDate];
 
-  await storeGoals(updatedGoals);
+  await savedGoals(updatedGoals);
   res.json({ message: 'Goal completion updated successfully', goal: goalToUpdate });
 });
 

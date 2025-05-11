@@ -5,15 +5,15 @@ const filePath = path.join(__dirname, 'goals.json');
 
 async function getGoals() {
   const fileData = await fs.readFile(filePath);
-  const storedGoals = JSON.parse(fileData);
-  return storedGoals;
+  const savedGoals = JSON.parse(fileData);
+  return savedGoals;
 }
 
-async function storeGoals(goals) {
+async function saveGoals(goals) {
   await fs.writeFile(filePath, JSON.stringify(goals));
 }
 
 module.exports = {
   getGoals,
-  storeGoals,
+  saveGoals,
 };
