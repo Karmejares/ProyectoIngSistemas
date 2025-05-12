@@ -9,12 +9,15 @@ export function UserProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [lastFed, setLastFed] = useState(null);
   const [foodInventory, setFoodInventory] = useState([]);
+  const [token, setToken] = useState(null); // Store the token here
 
   // ✅ Check token on load
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
       setIsLoggedIn(true);
+      // You might also load user info or other data here if needed
     }
   }, []);
 
@@ -24,14 +27,17 @@ export function UserProvider({ children }) {
   };
 
   // ✅ Log in a user
-  const logInUser = () => {
+  const logInUser = (newToken) => {
+    setToken(newToken);
     setIsLoggedIn(true);
+    localStorage.setItem("token", newToken); // Store the token in localStorage
   };
 
-  // ✅ Log out a user
+  // ✅ Log out user and clear token
   const logOutUser = () => {
-    localStorage.removeItem("token");
+    setToken(null);
     setIsLoggedIn(false);
+    localStorage.removeItem("token"); // Remove the token from localStorage
   };
 
   // ✅ Manage coins
@@ -66,6 +72,7 @@ export function UserProvider({ children }) {
         isLoggedIn,
         logInUser,
         logOutUser,
+        token,
         coins,
         addCoins,
         removeCoins,

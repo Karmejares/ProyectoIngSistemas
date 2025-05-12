@@ -1,19 +1,21 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Box, Typography, Alert } from "@mui/material";
 
 function LogIn() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
-  const { users, logInUser } = useContext(UserContext); // Access logInUser from context
+  const { logInUser } = useContext(UserContext); // Access logInUser from context
   const navigate = useNavigate();
 
+  // ✅ Handle form input change
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // ✅ Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(""); // Clear previous errors
@@ -32,28 +34,43 @@ function LogIn() {
         throw new Error(errorData.message || "Login failed");
       }
 
-      if (response.status === 200) {
-        const data = await response.json();
-        const token = data.token;
-        localStorage.setItem("token", token);
-        logInUser();
-        navigate("/Application");
-      }
+      // ✅ Successful login
+      const data = await response.json();
+      const token = data.token;
+
+      // ✅ Update context and store token
+      logInUser(token); // Pass the token to the context
+      navigate("/Application"); // Redirect to the application page
     } catch (err) {
       setError(err.message);
-      console.log(err.message);
+      console.log("Login error:", err.message);
     }
   };
 
-  // const userExists = users.some(
-  //   (user) =>
-  //     user.username === formData.username &&
-  //     user.password === formData.password
-  // );
-
   return (
-    <div>
-      <div>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        backgroundColor: "#f3f4f6",
+        padding: 3,
+      }}
+    >
+      <Box
+        sx={{
+          width: 300,
+          padding: 3,
+          borderRadius: 2,
+          boxShadow: 3,
+          backgroundColor: "#fff",
+        }}
+      >
+        <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+          Log In
+        </Typography>
+
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"
@@ -63,6 +80,7 @@ function LogIn() {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            required
           />
           <TextField
             label="Password"
@@ -72,17 +90,36 @@ function LogIn() {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            required
           />
-          <Button type="submit" variant="contained" color="primary">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
             Log In
           </Button>
         </form>
-        {error && <p>{error}</p>}
-        <div>
-          <Link to="/SignUp">Don't have an account? Sign Up</Link>
-        </div>
-      </div>
-    </div>
+
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Typography sx={{ mt: 2, textAlign: "center" }}>
+          Don't have an account?{" "}
+          <Link
+            to="/SignUp"
+            style={{ textDecoration: "none", color: "#1976d2" }}
+          >
+            Sign Up
+          </Link>
+        </Typography>
+      </Box>
+    </Box>
   );
 }
 
