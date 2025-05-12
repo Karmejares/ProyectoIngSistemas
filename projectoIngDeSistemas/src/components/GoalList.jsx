@@ -111,6 +111,7 @@ const GoalList = ({
                       //   "isCompleted:",
                       //   isCompleted
                       // ); // Debugging
+                      console.log('GoalList - renderDay:', { dateString, history: goal.history, includes: goal.history.includes(dateString) });
 
                       return (
                         <div

@@ -24,6 +24,7 @@ function CheckList({ goals, setGoals }) {
       try {
         const response = await fetch("http://localhost:3001/api/goals");
         const data = await response.json();
+        console.log('CheckList - Goals after fetch:', data.goals);
         setGoals(data.goals);
       } catch (error) {
         console.error("Error fetching goals:", error);
@@ -149,6 +150,7 @@ function CheckList({ goals, setGoals }) {
             : goal
         )
       );
+      console.log('CheckList - Goals after calendar click update:', goals);
     } catch (error) {
       console.error("Error updating goal completion:", error);
       setError("Failed to update goal completion. Please try again."); // Set error state
