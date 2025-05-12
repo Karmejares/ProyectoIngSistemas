@@ -1,4 +1,3 @@
-// filepath: c:\Users\james\OneDrive\Desktop\Proyecto ING SIS\projectoIngDeSistemas\src\components\GoalList.jsx
 import React from "react";
 import {
   List,
@@ -12,6 +11,51 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { FaListAlt } from "react-icons/fa";
+import dayjs from "dayjs";
+
+// ✅ Custom DayRenderer Component
+const DayRenderer = (props) => {
+  const { day, value, history } = props;
+
+  // Guard clause to prevent crashing
+  if (!day) {
+    return <div {...props} />;
+  }
+
+  const dateString = day.format("YYYY-MM-DD");
+  const formattedHistory = history.map((date) =>
+    dayjs(date).format("YYYY-MM-DD")
+  );
+
+  const isCompleted = formattedHistory.includes(dateString);
+  const isSelected = day.isSame(value, "day");
+
+  console.log("Rendering day:", dateString, "Completed:", isCompleted);
+
+  return (
+    <div
+      {...props}
+      style={{
+        backgroundColor: isCompleted
+          ? "#4CAF50" // Green if completed
+          : isSelected
+          ? "#2196F3" // Blue if selected
+          : "transparent",
+        color: isCompleted ? "white" : "inherit",
+        borderRadius: "50%",
+        width: "36px",
+        height: "36px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "2px",
+        cursor: "pointer",
+      }}
+    >
+      {day.date()}
+    </div>
+  );
+};
 
 const GoalList = ({
   goals,
@@ -79,7 +123,7 @@ const GoalList = ({
           </Typography>
           <Button
             size="small"
-            onClick={() => handleToggleCalendarVisibility(goal.id)} // Use the correct handler
+            onClick={() => handleToggleCalendarVisibility(goal.id)}
             sx={{ mt: 0.5 }}
           >
             <FaListAlt style={{ marginRight: 4 }} /> History
@@ -100,41 +144,10 @@ const GoalList = ({
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateCalendar
                     disableFuture
-                    renderDay={(day, value, DayComponentProps) => {
-                      const dateString = day.format("YYYY-MM-DD");
-                      const isCompleted = goal.history.includes(dateString);
-                      const isSelected = value && day.isSame(value, "day");
-
-                      // console.log(
-                      //   "Rendering day:",
-                      //   dateString,
-                      //   "isCompleted:",
-                      //   isCompleted
-                      // ); // Debugging
-                      console.log('GoalList - renderDay:', { dateString, history: goal.history, includes: goal.history.includes(dateString) });
-
-                      return (
-                        <div
-                          {...DayComponentProps}
-                          style={{
-                            backgroundColor: isCompleted
-                              ? "lightblue"
-                              : isSelected
-                              ? "lightgreen"
-                              : "transparent",
-                            borderRadius: "50%",
-                            width: "36px",
-                            height: "36px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            margin: "2px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {day.date()}
-                        </div>
-                      );
+                    slots={{
+                      day: (props) => (
+                        <DayRenderer {...props} history={goal.history} />
+                      ),
                     }}
                   />
                 </LocalizationProvider>

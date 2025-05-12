@@ -12,12 +12,17 @@
   {
     "id": "0.7935640163744277",
     "name": "Hit to the gym",
-    "history": []
+    "history": [
+      "2025-05-11",
+      "2025-05-12"
+    ]
   },
   {
     "id": "1",
     "name": "Learn Node.js",
-    "history": []
+    "history": [
+      "2025-05-12"
+    ]
   },
   {
     "id": "2",
