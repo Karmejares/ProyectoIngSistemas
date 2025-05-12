@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import { TextField, Button } from "@mui/material";
- 
+
 function LogIn() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
@@ -36,46 +36,46 @@ function LogIn() {
         const data = await response.json();
         const token = data.token;
         localStorage.setItem("token", token);
-        logInUser()
+        logInUser();
         navigate("/Application");
-        
       }
     } catch (err) {
       setError(err.message);
-      console.log(err.message)
+      console.log(err.message);
     }
   };
-  
+
   // const userExists = users.some(
   //   (user) =>
   //     user.username === formData.username &&
   //     user.password === formData.password
   // );
-  
-  
+
   return (
     <div>
       <div>
         <form onSubmit={handleSubmit}>
           <TextField
- label="Username"
- type="text"
+            label="Username"
+            type="text"
             name="username"
             value={formData.username}
             onChange={handleChange}
- fullWidth
- margin="normal"
+            fullWidth
+            margin="normal"
           />
           <TextField
- label="Password"
- type="password"
+            label="Password"
+            type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
- fullWidth
- margin="normal"
+            fullWidth
+            margin="normal"
           />
-          <Button type="submit" variant="contained" color="primary">Sign In</Button>
+          <Button type="submit" variant="contained" color="primary">
+            Log In
+          </Button>
         </form>
         {error && <p>{error}</p>}
         <div>
@@ -87,4 +87,3 @@ function LogIn() {
 }
 
 export default LogIn;
-
