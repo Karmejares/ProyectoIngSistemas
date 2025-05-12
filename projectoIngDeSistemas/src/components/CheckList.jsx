@@ -24,7 +24,7 @@ function CheckList({ goals, setGoals }) {
       try {
         const response = await fetch("http://localhost:3001/api/goals");
         const data = await response.json();
-        console.log('CheckList - Goals after fetch:', data.goals);
+        console.log("CheckList - Goals after fetch:", data.goals);
         setGoals(data.goals);
       } catch (error) {
         console.error("Error fetching goals:", error);
@@ -49,7 +49,6 @@ function CheckList({ goals, setGoals }) {
     if (!newGoal) return;
 
     const newGoalObject = {
-      id: Date.now(),
       name: newGoal,
       frequency:
         newGoalFrequency === "custom" ? customFrequencyDetails : "daily",
@@ -69,8 +68,11 @@ function CheckList({ goals, setGoals }) {
         throw new Error("Failed to add goal.");
       }
 
-      // Update the frontend state after successful backend update
-      setGoals((prevGoals) => [...prevGoals, newGoalObject]);
+      // ✅ Get the new goal with the correct ID from the backend
+      const { goal } = await response.json();
+
+      // ✅ Update the frontend state after successful backend update
+      setGoals((prevGoals) => [...prevGoals, goal]);
       setNewGoal("");
       setCustomFrequencyDetails([]);
     } catch (error) {
@@ -150,15 +152,32 @@ function CheckList({ goals, setGoals }) {
             : goal
         )
       );
-      console.log('CheckList - Goals after calendar click update:', goals);
+      console.log("CheckList - Goals after calendar click update:", goals);
     } catch (error) {
       console.error("Error updating goal completion:", error);
       setError("Failed to update goal completion. Please try again."); // Set error state
     }
   };
 
-  const handleDeleteGoal = (id) => {
-    setGoals((prevGoals) => prevGoals.filter((goal) => goal.id !== id));
+  const handleDeleteGoal = async (id) => {
+    setError(null); // Clear previous errors
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/goals/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete goal.");
+      }
+
+      // ✅ If successful, update frontend state
+      setGoals((prevGoals) => prevGoals.filter((goal) => goal.id !== id));
+      console.log(`Goal ${id} deleted successfully.`);
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+      setError("Failed to delete goal. Please try again.");
+    }
   };
 
   const toggleCalendarVisibility = (id) => {
@@ -202,7 +221,11 @@ function CheckList({ goals, setGoals }) {
   };
 
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box
+      sx={{
+        padding: 2,
+      }}
+    >
       <Grid container spacing={2} alignItems="center">
         <Grid item xs>
           <TextField

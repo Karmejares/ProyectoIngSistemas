@@ -11,18 +11,23 @@ function Modal({ onClose, children }) {
     >
       <Box
         sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          bgcolor: 'background.paper',
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
           minWidth: 300, // Adjust as needed
+          overflowY: "auto", // ✅ Enables vertical scroll
+          maxHeight: "80vh", // ✅ Keeps the height manageable
+          paddingRight: "10px", // ✅ Prevents scrollbar overlap
         }}
       >
         {children}
-        <Button onClick={onClose} sx={{ mt: 2 }}>Close</Button>
+        <Button onClick={onClose} sx={{ mt: 2 }}>
+          Close
+        </Button>
       </Box>
     </MuiModal>
   );

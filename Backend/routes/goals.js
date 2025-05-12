@@ -3,34 +3,34 @@ const { getGoals, storeGoals } = require("../data/goals");
 
 const router = express.Router();
 
-// GET /api/goals
+// 🚀 GET /api/goals
 router.get("/", async (req, res) => {
-  console.log("GET /api/goals route hit"); // Debug log
+  console.log("GET /api/goals route hit");
   try {
-    const goals = await getGoals(); // Fetch goals from the data file
-    console.log("Goals fetched successfully:", goals); // Log the fetched goals
-    res.json({ goals }); // Send the goals as a JSON response
+    const goals = await getGoals();
+    console.log("Goals fetched successfully:", goals);
+    res.json({ goals });
   } catch (error) {
-    console.error("Error fetching goals:", error); // Log any errors
-    res.status(500).json({ message: "Failed to fetch goals" }); // Send an error response
+    console.error("Error fetching goals:", error);
+    res.status(500).json({ message: "Failed to fetch goals" });
   }
 });
 
-// POST /api/goals
+// 🚀 POST /api/goals
 router.post("/", async (req, res) => {
-  console.log("POST /api/goals route hit"); // Debug log
-  console.log("Request body:", req.body); // Log the request body
+  console.log("POST /api/goals route hit");
+  console.log("Request body:", req.body);
 
   try {
     const { name, history = [] } = req.body;
 
     if (!name) {
-      console.log("Goal name is missing"); // Debug log
+      console.log("Goal name is missing");
       return res.status(400).json({ message: "Goal name is required" });
     }
 
     const existingGoals = await getGoals();
-    console.log("Existing goals:", existingGoals); // Log existing goals
+    console.log("Existing goals:", existingGoals);
 
     const newGoal = {
       id: Math.random().toString(),
@@ -41,33 +41,33 @@ router.post("/", async (req, res) => {
     const updatedGoals = [newGoal, ...existingGoals];
     await storeGoals(updatedGoals);
 
-    console.log("New goal created:", newGoal); // Log the new goal
+    console.log("New goal created:", newGoal);
     res
       .status(201)
       .json({ message: "Goal created successfully.", goal: newGoal });
   } catch (error) {
-    console.error("Error creating goal:", error); // Log any errors
+    console.error("Error creating goal:", error);
     res.status(500).json({ message: "Failed to create goal" });
   }
 });
 
-// PUT /api/goals/:id/complete
+// 🚀 PUT /api/goals/:id/complete
 router.put("/:id/complete", async (req, res) => {
-  console.log("PUT /api/goals/:id/complete route hit"); // Debug log
-  console.log("Request params:", req.params); // Log the request parameters
-  console.log("Request body:", req.body); // Log the request body
+  console.log("PUT /api/goals/:id/complete route hit");
+  console.log("Request params:", req.params);
+  console.log("Request body:", req.body);
 
   const goalId = req.params.id;
   const { completionDate } = req.body;
 
   if (!completionDate) {
-    console.log("Completion date is missing"); // Debug log
+    console.log("Completion date is missing");
     return res.status(400).json({ message: "completionDate is required" });
   }
 
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(completionDate)) {
-    console.log("Invalid date format:", completionDate); // Debug log
+    console.log("Invalid date format:", completionDate);
     return res
       .status(400)
       .json({ message: "Invalid date format. Use YYYY-MM-DD." });
@@ -75,12 +75,12 @@ router.put("/:id/complete", async (req, res) => {
 
   try {
     const existingGoals = await getGoals();
-    console.log("Existing goals:", existingGoals); // Log existing goals
+    console.log("Existing goals:", existingGoals);
 
     const goalIndex = existingGoals.findIndex((goal) => goal.id === goalId);
 
     if (goalIndex === -1) {
-      console.log("Goal not found with ID:", goalId); // Debug log
+      console.log("Goal not found with ID:", goalId);
       return res.status(404).json({ message: "Goal not found" });
     }
 
@@ -90,7 +90,7 @@ router.put("/:id/complete", async (req, res) => {
       ? [...goalToUpdate.history, completionDate]
       : [completionDate];
 
-    console.log("Updated goal:", goalToUpdate); // Log the updated goal
+    console.log("Updated goal:", goalToUpdate);
     await storeGoals(updatedGoals);
 
     res.json({
@@ -98,39 +98,66 @@ router.put("/:id/complete", async (req, res) => {
       goal: goalToUpdate,
     });
   } catch (error) {
-    console.error("Error updating goal completion:", error); // Log any errors
+    console.error("Error updating goal completion:", error);
     res.status(500).json({ message: "Failed to update goal completion" });
   }
 });
 
-// PUT /api/goals/:id
+// 🚀 PUT /api/goals/:id
 router.put("/:id", async (req, res) => {
-  console.log("PUT /api/goals/:id route hit"); // Debug log
-  console.log("Request params:", req.params); // Log the request parameters
-  console.log("Request body:", req.body); // Log the request body
+  console.log("PUT /api/goals/:id route hit");
+  console.log("Request params:", req.params);
+  console.log("Request body:", req.body);
 
   const { id } = req.params;
   const updatedGoal = req.body;
 
   try {
     const goals = await getGoals();
-    console.log("Existing goals:", goals); // Log existing goals
+    console.log("Existing goals:", goals);
 
-    const goalIndex = goals.findIndex((goal) => goal.id === id); // Compare as strings
+    const goalIndex = goals.findIndex((goal) => goal.id === id);
 
     if (goalIndex === -1) {
-      console.log("Goal not found with ID:", id); // Debug log
+      console.log("Goal not found with ID:", id);
       return res.status(404).json({ message: "Goal not found" });
     }
 
-    goals[goalIndex] = updatedGoal; // Update the goal
-    console.log("Updated goal:", updatedGoal); // Log the updated goal
+    goals[goalIndex] = updatedGoal;
+    console.log("Updated goal:", updatedGoal);
 
-    await storeGoals(goals); // Save the updated goals to the file
+    await storeGoals(goals);
     res.json({ message: "Goal updated successfully", goal: updatedGoal });
   } catch (error) {
-    console.error("Error updating goal:", error); // Log any errors
+    console.error("Error updating goal:", error);
     res.status(500).json({ message: "Failed to update goal" });
+  }
+});
+
+// 🚀 DELETE /api/goals/:id
+router.delete("/:id", async (req, res) => {
+  console.log("DELETE /api/goals/:id route hit");
+  console.log("Request params:", req.params);
+
+  const { id } = req.params;
+
+  try {
+    const goals = await getGoals();
+    console.log("Existing goals:", goals);
+
+    const updatedGoals = goals.filter((goal) => goal.id !== id);
+
+    if (goals.length === updatedGoals.length) {
+      console.log("Goal not found with ID:", id);
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    await storeGoals(updatedGoals);
+    console.log(`Goal with ID ${id} deleted successfully.`);
+    res.status(200).json({ message: "Goal deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting goal:", error);
+    res.status(500).json({ message: "Failed to delete goal" });
   }
 });
 

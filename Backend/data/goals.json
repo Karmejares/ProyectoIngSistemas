@@ -1,32 +1,16 @@
 [
   {
-    "id": "0.8013803389513676",
-    "name": "adasdsad",
+    "id": "0.9714641062394185",
+    "name": "Create a new project",
     "history": []
   },
   {
-    "id": "0.11820345827645395",
-    "name": "sasdasda",
-    "history": []
-  },
-  {
-    "id": "0.7935640163744277",
-    "name": "Hit to the gym",
+    "id": "0.17669400181514372",
+    "name": "sdadsdada",
     "history": [
-      "2025-05-11",
-      "2025-05-12"
+      "2025-05-01",
+      "2025-05-02",
+      "2025-05-03"
     ]
-  },
-  {
-    "id": "1",
-    "name": "Learn Node.js",
-    "history": [
-      "2025-05-12"
-    ]
-  },
-  {
-    "id": "2",
-    "name": "Build a REST API",
-    "history": []
   }
 ]
