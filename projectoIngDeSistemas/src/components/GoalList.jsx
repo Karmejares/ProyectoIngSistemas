@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   List,
   ListItem,
@@ -12,14 +12,17 @@ import {
   DialogContentText,
   DialogTitle,
   Collapse,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaListAlt } from "react-icons/fa";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import DayRenderer from "./DayRenderer"; // ✅ Import DayRenderer
+import DayRenderer from "./DayRenderer";
 import dayjs from "dayjs";
+import { UserContext } from "./UserContext"; // ✅ Import UserContext
 
 const GoalList = ({
   goals,
@@ -34,6 +37,12 @@ const GoalList = ({
 }) => {
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [open, setOpen] = useState(false);
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
+
+  // ✅ Import addCoins and removeCoins from your UserContext
+  const { addCoins, removeCoins } = useContext(UserContext);
 
   // ✅ Open Modal
   const handleOpenModal = (goal) => {
@@ -47,12 +56,29 @@ const GoalList = ({
     setSelectedGoal(null);
   };
 
-  // ✅ Confirm Deletion
-  const handleConfirmDelete = async () => {
-    if (selectedGoal) {
-      await handleDeleteGoal(selectedGoal.id);
-      handleCloseModal();
+  // ✅ Handle Checkbox change (Add or Remove Coins)
+  const handleCheckboxChange = (goal) => {
+    handleToggleGoal(goal.id);
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    if (goal.history.includes(today)) {
+      // ✅ Unchecked => Remove 10 Coins
+      removeCoins(10);
+      setSnackbarMessage("💔 10 Coins Removed!");
+      setAlertSeverity("error");
+    } else {
+      // ✅ Checked => Add 10 Coins
+      addCoins(10);
+      setSnackbarMessage("🎉 10 Coins Added!");
+      setAlertSeverity("success");
     }
+    setShowSnackbar(true);
+  };
+
+  // ✅ Close the Snackbar after a while
+  const handleCloseSnackbar = () => {
+    setShowSnackbar(false);
   };
 
   return (
@@ -79,7 +105,6 @@ const GoalList = ({
                   padding: "10px",
                 }}
               >
-                {/* Goal Information */}
                 <Box
                   sx={{
                     display: "flex",
@@ -93,7 +118,7 @@ const GoalList = ({
                       checked={goal.history.includes(
                         new Date().toISOString().slice(0, 10)
                       )}
-                      onChange={() => handleToggleGoal(goal.id)}
+                      onChange={() => handleCheckboxChange(goal)}
                       disabled={deleteMode}
                     />
                     <Typography
@@ -142,7 +167,6 @@ const GoalList = ({
                   Streak: {calculateStreak(goal)}
                 </Typography>
 
-                {/* ✅ Calendar Collapse */}
                 <Collapse
                   in={visibleCalendars[goal.id] || false}
                   timeout="auto"
@@ -171,29 +195,22 @@ const GoalList = ({
         </List>
       </AnimatePresence>
 
-      {/* ✅ Confirmation Modal */}
-      <Dialog
-        open={open}
-        onClose={handleCloseModal}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+      {/* ✅ Snackbar Notification */}
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <DialogTitle id="alert-dialog-title">{"Delete Goal?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete the goal:{" "}
-            <strong>{selectedGoal?.name}</strong>? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseModal} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={alertSeverity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
