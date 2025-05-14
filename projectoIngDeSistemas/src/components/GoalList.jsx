@@ -211,6 +211,29 @@ const GoalList = ({
           {snackbarMessage}
         </Alert>
       </Snackbar>
+      <Dialog open={open} onClose={handleCloseModal}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this goal? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              handleDeleteGoal(selectedGoal.id); // <-- Call the delete function
+              handleCloseModal();
+            }}
+            color="error"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
