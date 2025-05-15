@@ -1,50 +1,95 @@
 const express = require("express");
-const fs = require("fs/promises");
-const path = require("path");
 const jwt = require("jsonwebtoken");
-
+const bcrypt = require("bcryptjs");
 const router = express.Router();
-const usersFilePath = path.join(__dirname, "../data/usuarios.json");
+const User = require("../models/User"); // Import the User model
 
-// Secret key for JWT (in a real app, keep it in environment variables)
-const SECRET_KEY = "your_secret_key";
+// 🔑 Secret key for JWT (stored in environment variable)
+const SECRET_KEY = process.env.JWT_SECRET;
 
+// ✅ Register (Sign Up)
+router.post("/signup", async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    // 🔍 Check if the user already exists
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Username already exists" });
+    }
+
+    // 🔒 Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // ✅ Create a new user in MongoDB
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      coins: 100, // Optional: Initialize with 100 coins
+    });
+
+    await newUser.save();
+
+    res.status(201).json({ success: true, message: "User created" });
+  } catch (error) {
+    console.error("❌ Error during signup:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// ✅ Login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const fileData = await fs.readFile(usersFilePath, "utf-8");
-    const users = JSON.parse(fileData);
+    // 🔍 Find user in the database
+    const user = await User.findOne({ username });
 
-    const user = users.find(
-      (u) => u.username === username && u.password === password
-    );
-
-    if (user) {
-      // ✅ Generate JWT token
-      const token = jwt.sign(
-        {
-          username: user.username,
-          email: user.email,
-        },
-        SECRET_KEY,
-        { expiresIn: "1h" } // Token expires in 1 hour
-      );
-
-      // ✅ Send token to the frontend
-      return res.status(200).json({
-        success: true,
-        message: "Login successful",
-        token: token,
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
-    } else {
+    }
+
+    // 🔒 Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
     }
+
+    // ✅ Generate JWT token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+      SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    // ✅ Send token and user info
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: token,
+      user: {
+        username: user.username,
+        email: user.email,
+        coins: user.coins,
+      },
+    });
   } catch (error) {
-    console.error("Error during login:", error);
+    console.error("❌ Error during login:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error",
@@ -52,27 +97,50 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+// ✅ Get Profile (Protected Route)
 
+router.get("/profile", async (req, res) => {
   try {
-    const fileData = await fs.readFile(usersFilePath, "utf-8");
-    const users = JSON.parse(fileData);
+    console.log("🔍 Incoming request to /profile");
 
-    const userExists = users.some((u) => u.username === username);
+    // 🔐 Get token from headers
+    console.log("🔐 Authorization Header:", req.headers.authorization);
+    const token = req.headers.authorization.split(" ")[1];
 
-    if (userExists) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Username already exists" });
+    if (!token) {
+      console.error("❌ No token provided");
+      return res.status(401).json({ message: "No token provided" });
     }
-    users.push({ username, email, password });
 
-    await fs.writeFile(usersFilePath, JSON.stringify(users));
-    res.status(200).json({ success: true, message: "User created" });
+    // 🔓 Verify token and extract user ID
+    console.log("🔓 Verifying token...");
+    const decoded = jwt.verify(token, SECRET_KEY);
+    console.log("✅ Token decoded:", decoded);
+
+    if (!decoded.id) {
+      console.error("❌ Invalid token format");
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    // 🔍 Find the user in the database
+    console.log("🔍 Looking for user with ID:", decoded.id);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      console.warn("⚠️ User not found in database");
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ Return the user information
+    console.log("✅ User found:", user.username);
+    res.status(200).json({
+      username: user.username,
+      email: user.email,
+      coins: user.coins,
+    });
   } catch (error) {
-    console.error("Error during signup:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("❌ Error fetching user profile:", error.message);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
