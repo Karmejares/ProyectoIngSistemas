@@ -2,12 +2,16 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
-const User = require("../models/User"); // Import the User model
+const User = require("../models/User");
+const userController = require("../controllers/userController");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // 🔑 Secret key for JWT (stored in environment variable)
 const SECRET_KEY = process.env.JWT_SECRET;
 
-// ✅ Register (Sign Up)
+/**
+ * ✅ Register (Sign Up)
+ */
 router.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -16,9 +20,10 @@ router.post("/signup", async (req, res) => {
     const existingUser = await User.findOne({ username });
 
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Username already exists" });
+      return res.status(400).json({
+        success: false,
+        message: "Username already exists",
+      });
     }
 
     // 🔒 Hash the password
@@ -29,19 +34,42 @@ router.post("/signup", async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      coins: 100, // Optional: Initialize with 100 coins
+      coins: 50, // 🪙 Initialize with 50 coins
     });
 
     await newUser.save();
 
-    res.status(201).json({ success: true, message: "User created" });
+    // ✅ Generate a JWT token for immediate login after sign-up
+    const token = jwt.sign(
+      {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+      SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    // ✅ Send response with token and user info
+    res.status(201).json({
+      success: true,
+      message: "User created",
+      token: token,
+      user: {
+        username: newUser.username,
+        email: newUser.email,
+        coins: newUser.coins,
+      },
+    });
   } catch (error) {
     console.error("❌ Error during signup:", error.message);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
-// ✅ Login
+/**
+ * ✅ Login
+ */
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -97,42 +125,25 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ✅ Get Profile (Protected Route)
+/**
+ * ✅ Update Coins (Protected Route)
+ * Expects: { coins: number }
+ */
+router.post("/updateCoins", authMiddleware, userController.updateCoins);
 
-router.get("/profile", async (req, res) => {
+/**
+ * ✅ Get Profile (Protected Route)
+ */
+router.get("/profile", authMiddleware, async (req, res) => {
   try {
-    console.log("🔍 Incoming request to /profile");
-
-    // 🔐 Get token from headers
-    console.log("🔐 Authorization Header:", req.headers.authorization);
-    const token = req.headers.authorization.split(" ")[1];
-
-    if (!token) {
-      console.error("❌ No token provided");
-      return res.status(401).json({ message: "No token provided" });
-    }
-
-    // 🔓 Verify token and extract user ID
-    console.log("🔓 Verifying token...");
-    const decoded = jwt.verify(token, SECRET_KEY);
-    console.log("✅ Token decoded:", decoded);
-
-    if (!decoded.id) {
-      console.error("❌ Invalid token format");
-      return res.status(401).json({ message: "Invalid token" });
-    }
-
-    // 🔍 Find the user in the database
-    console.log("🔍 Looking for user with ID:", decoded.id);
-    const user = await User.findById(decoded.id);
+    // `authMiddleware` already sets `req.user`, no need to manually extract token
+    const user = await User.findById(req.user.id);
 
     if (!user) {
-      console.warn("⚠️ User not found in database");
       return res.status(404).json({ message: "User not found" });
     }
 
     // ✅ Return the user information
-    console.log("✅ User found:", user.username);
     res.status(200).json({
       username: user.username,
       email: user.email,

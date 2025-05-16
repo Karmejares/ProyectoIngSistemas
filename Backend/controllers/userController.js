@@ -1,4 +1,3 @@
-// controllers/userController.js
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -17,8 +16,9 @@ exports.registerUser = async (req, res) => {
 
     const newUser = new User({
       username,
-      email, // <--- Added email here
+      email,
       password: hashedPassword,
+      coins: 50, // 🪙 Initialize with 50 coins
     });
 
     await newUser.save();
@@ -48,7 +48,12 @@ exports.loginUser = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.status(200).json({ token, coins: user.coins });
+    res.status(200).json({
+      token,
+      coins: user.coins,
+      username: user.username,
+      email: user.email,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -57,8 +62,8 @@ exports.loginUser = async (req, res) => {
 
 // 🔄 Update Coins
 exports.updateCoins = async (req, res) => {
-  const { amount, operation } = req.body;
-  const userId = req.user.id;
+  const { coins } = req.body;
+  const userId = req.user.id; // User ID from JWT
 
   try {
     const user = await User.findById(userId);
@@ -67,14 +72,12 @@ exports.updateCoins = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (operation === "add") {
-      user.coins += amount;
-    } else if (operation === "remove") {
-      user.coins = Math.max(0, user.coins - amount);
-    }
+    user.coins = coins;
 
     await user.save();
-    res.status(200).json({ coins: user.coins });
+    res
+      .status(200)
+      .json({ message: "Coins updated successfully", coins: user.coins });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -83,7 +86,8 @@ exports.updateCoins = async (req, res) => {
 
 // 🔄 Update Time Limit
 exports.updateTimeLimit = async (req, res) => {
-  const { userId, timeLimit } = req.body;
+  const { timeLimit } = req.body;
+  const userId = req.user.id;
 
   try {
     const user = await User.findById(userId);
@@ -100,7 +104,8 @@ exports.updateTimeLimit = async (req, res) => {
 
 // 🔄 Update Privacy
 exports.updatePrivacy = async (req, res) => {
-  const { userId, privacy } = req.body;
+  const { privacy } = req.body;
+  const userId = req.user.id;
 
   try {
     const user = await User.findById(userId);
@@ -117,7 +122,8 @@ exports.updatePrivacy = async (req, res) => {
 
 // 🔄 Change Password
 exports.changePassword = async (req, res) => {
-  const { userId, newPassword } = req.body;
+  const { newPassword } = req.body;
+  const userId = req.user.id;
 
   try {
     const user = await User.findById(userId);
@@ -136,7 +142,7 @@ exports.changePassword = async (req, res) => {
 
 // 🔄 Delete Account
 exports.deleteAccount = async (req, res) => {
-  const { userId } = req.body;
+  const userId = req.user.id;
 
   try {
     await User.findByIdAndDelete(userId);

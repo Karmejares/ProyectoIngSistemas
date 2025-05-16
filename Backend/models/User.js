@@ -9,6 +9,10 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     timeLimit: { type: String, default: "00:00" }, // Added this for time limit
     isLoggedIn: { type: Boolean, default: false },
+    coins: {
+      type: Number,
+      default: 50, // ✅ This should be 50 if not provided during creation
+    },
   },
   {
     timestamps: true,

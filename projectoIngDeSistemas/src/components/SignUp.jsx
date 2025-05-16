@@ -1,6 +1,5 @@
-import React, { useState, useContext } from "react";
-import { UserContext } from "./UserContext"; // Import UserContext
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { TextField, Button, Typography, Box } from "@mui/material";
 
 function SignUp() {
@@ -13,16 +12,19 @@ function SignUp() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const { addUser } = useContext(UserContext); // Access the addUser function from context
   const navigate = useNavigate(); // Initialize navigation
 
+  // ✅ Handle Form Change
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (event) => {
+  // ✅ Handle Form Submit
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // ✅ Basic Validations
     if (!formData.username || !formData.email || !formData.password) {
       setError("All fields are required.");
       setSuccess("");
@@ -35,51 +37,58 @@ function SignUp() {
       return;
     }
 
-    // Make the fetch call to /auth/signup
-    fetch("http://localhost:3001/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.message || "Signup failed");
+    try {
+      // ✅ API Call to Register
+      const response = await fetch(
+        "http://localhost:3001/api/usuarios/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            password: formData.password,
+            email: formData.email, // <-- Add this line
+          }),
         }
-        const data = await response.json();
-        return { response, data };
-      })
-      .then(({ response, data }) => {
-        if (response.status === 200) {
-          navigate("/");
-        }
-      })
-      .catch((err) => {
-        // Handle errors
-        console.error("Error during signup:", err);
-        setError(err.message);
-        setSuccess("");
+      );
+
+      // ✅ Handle Response
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || "Signup failed");
+      }
+
+      setSuccess("Registration successful! Redirecting to login...");
+      setError("");
+
+      // ✅ Clear the form
+      setFormData({
+        username: "",
+        email: "",
+        dob: "",
+        password: "",
+        confirmPassword: "",
       });
 
-    setFormData({
-      username: "",
-      email: "",
-      dob: "",
-      password: "",
-      confirmPassword: "",
-    });
+      // ✅ Redirect after 2 seconds
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (err) {
+      console.error("Error during signup:", err.message);
+      setError(err.message);
+      setSuccess("");
+    }
   };
 
+  // ✅ Handle Navigation Back to Login
   const handleBackToLogin = () => {
     navigate("/"); // Navigate back to the login page
   };
 
+  // ✅ Render the Form
   return (
     <Box
       sx={{
@@ -157,6 +166,7 @@ function SignUp() {
           Register
         </Button>
       </form>
+
       {error && (
         <Typography variant="body2" color="error" sx={{ mt: 2 }}>
           {error}
@@ -167,6 +177,7 @@ function SignUp() {
           {success}
         </Typography>
       )}
+
       <Button
         variant="outlined"
         color="secondary"

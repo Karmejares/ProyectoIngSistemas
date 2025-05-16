@@ -1,82 +1,132 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "./UserContext"; // Import UserContext
+import { UserContext } from "./UserContext";
 import classes from "./OptionsMenu.module.css";
+import axios from "axios";
+import { TimerContext } from "./TimerContext";
 
 function OptionsMenu() {
   const navigate = useNavigate();
-  const { users, setUsers, isLoggedIn, logOutUser } = useContext(UserContext); // Access users and context functions
-  const [timeLimit, setTimeLimit] = useState(""); // State to store the time limit
-  const [timeExceeded, setTimeExceeded] = useState(false); // State to track if time is exceeded
+  const { isLoggedIn, logOutUser, username } = useContext(UserContext);
 
+  const [timeLimit, setTimeLimit] = useState(0); // Minutes
+  const [timeExceeded, setTimeExceeded] = useState(false);
+  const [countdown, setCountdown] = useState(null);
+  const { remainingTime, setRemainingTime, formatTime } =
+    useContext(TimerContext);
+
+  // ✅ Fetch time limit from the server when the component mounts
+  useEffect(() => {
+    if (username) {
+      axios
+        .get(`http://localhost:3001/api/options/${username}`)
+        .then((response) => {
+          if (response.data && response.data.timeLimit) {
+            setTimeLimit(response.data.timeLimit);
+            const savedTime = localStorage.getItem("remainingTime");
+            if (savedTime) {
+              setRemainingTime(parseInt(savedTime));
+            } else {
+              const milliseconds = response.data.timeLimit * 60 * 1000;
+              setRemainingTime(milliseconds);
+            }
+          }
+        })
+        .catch((error) => console.error("Error fetching time limit:", error));
+    }
+  }, [username]);
+
+  // ✅ Save the timer in localStorage to persist state on modal close
+  useEffect(() => {
+    if (remainingTime !== null) {
+      localStorage.setItem("remainingTime", remainingTime);
+    }
+  }, [remainingTime]);
+
+  // ✅ Countdown Timer Logic
+  useEffect(() => {
+    if (remainingTime !== null && remainingTime > 0) {
+      const countdownInterval = setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 1000) {
+            clearInterval(countdownInterval);
+            localStorage.removeItem("remainingTime");
+            setTimeExceeded(true);
+            return 0;
+          }
+          return prev - 1000;
+        });
+      }, 1000);
+
+      setCountdown(countdownInterval);
+      return () => clearInterval(countdownInterval);
+    }
+  }, [remainingTime]);
+
+  // ✅ Trigger alert when time is up
+  useEffect(() => {
+    if (timeExceeded) {
+      alert("Time limit exceeded! Please take a break.");
+      setTimeExceeded(false); // Reset after alert
+    }
+  }, [timeExceeded]);
+
+  // ✅ Handle Timer Setting
+  const handleSetTimeLimit = (e) => {
+    const minutes = parseInt(e.target.value) || 0;
+    setTimeLimit(minutes);
+
+    // 🔄 Convert to milliseconds and update both local and global state
+    const milliseconds = minutes * 60 * 1000;
+    setRemainingTime(milliseconds); // <-- This updates the global context
+
+    if (username) {
+      console.log(
+        `🔥 Sending PUT to /api/options/${username} with timeLimit: ${minutes}`
+      );
+
+      axios
+        .put(`http://localhost:3001/api/options/${username}`, {
+          timeLimit: minutes,
+        })
+        .then((response) => {
+          console.log("✅ Time limit updated in the database:", response.data);
+        })
+        .catch((error) => {
+          console.error("❌ Error updating time limit:", error.message);
+          if (error.response) {
+            console.error("❌ Backend response:", error.response.data);
+          }
+        });
+    } else {
+      console.error("❌ Username not found in context.");
+    }
+  };
+
+  // ✅ Logout function
   const handleLogout = () => {
     alert("You are now logged out!");
-    logOutUser(); // Log out the user
-    navigate("/"); // Redirect to the login page
+    logOutUser();
+    navigate("/");
   };
 
-  const handleSetTimeLimit = (e) => {
-    setTimeLimit(e.target.value);
-  };
-
-  const handleChangePassword = () => {
-    alert("Redirecting to Change Password page...");
-    // Add navigation or modal logic for changing password
-  };
-
+  // ✅ Delete Account Handler
   const handleDeleteAccount = () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete your account? This action cannot be undone."
     );
+
     if (confirmDelete) {
-      // Remove the logged-in user from the users array
-      const updatedUsers = users.filter((user) => user.isLoggedIn !== true);
-      setUsers(updatedUsers); // Update the users in the context
-      logOutUser(); // Log out the user
-      alert("Your account has been deleted.");
-      navigate("/"); // Redirect to the login page
+      axios
+        .delete(`http://localhost:3001/api/options/${username}`)
+        .then(() => {
+          alert("Your account has been deleted.");
+          logOutUser();
+          navigate("/");
+        })
+        .catch((error) => console.error("Error deleting account:", error));
     }
   };
-
-  const handlePrivacySettings = () => {
-    alert("Redirecting to Privacy Settings...");
-    // Add navigation or modal logic for privacy settings
-  };
-
-  const handleHelpSupport = () => {
-    alert("Redirecting to Help & Support...");
-    // Add navigation or modal logic for help and support
-  };
-
-  const handleAboutApp = () => {
-    alert(
-      "This app is designed to help you manage your goals and time effectively!"
-    );
-  };
-
-  useEffect(() => {
-    if (timeLimit) {
-      const [hours, minutes] = timeLimit.split(":").map(Number);
-      const limitTime = new Date();
-      limitTime.setHours(hours, minutes, 0);
-
-      const checkTime = setInterval(() => {
-        const currentTime = new Date();
-        if (currentTime > limitTime) {
-          setTimeExceeded(true);
-          clearInterval(checkTime);
-        }
-      }, 1000);
-
-      return () => clearInterval(checkTime); // Cleanup interval on component unmount
-    }
-  }, [timeLimit]);
-
-  useEffect(() => {
-    if (timeExceeded) {
-      alert("Time limit exceeded! Please take a break.");
-    }
-  }, [timeExceeded]);
 
   return (
     <div className={classes.menuContainer}>
@@ -90,21 +140,20 @@ function OptionsMenu() {
         <li>
           <div className={classes.timeLimitContainer}>
             <label htmlFor="timeLimit" className={classes.label}>
-              Set Time Limit (HH:MM):
+              Set Timer (Minutes):
             </label>
             <input
-              type="time"
+              type="number"
               id="timeLimit"
               value={timeLimit}
               onChange={handleSetTimeLimit}
               className={classes.timeInput}
+              placeholder="Minutes"
             />
+            {remainingTime !== null && (
+              <p>Time Remaining: {formatTime(remainingTime)}</p>
+            )}
           </div>
-        </li>
-        <li>
-          <button onClick={handleChangePassword} className={classes.menuButton}>
-            Change Password
-          </button>
         </li>
         <li>
           <button onClick={handleDeleteAccount} className={classes.menuButton}>
@@ -112,22 +161,13 @@ function OptionsMenu() {
           </button>
         </li>
         <li>
-          <button
-            onClick={handlePrivacySettings}
-            className={classes.menuButton}
-          >
-            Privacy Settings
-          </button>
+          <button className={classes.menuButton}>Change Password</button>
         </li>
         <li>
-          <button onClick={handleHelpSupport} className={classes.menuButton}>
-            Help & Support
-          </button>
+          <button className={classes.menuButton}>Privacy Settings</button>
         </li>
         <li>
-          <button onClick={handleAboutApp} className={classes.menuButton}>
-            About the App
-          </button>
+          <button className={classes.menuButton}>View Profile</button>
         </li>
       </ul>
     </div>

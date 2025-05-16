@@ -6,10 +6,12 @@ import SignUp from "./components/SignUp";
 import Application from "./components/Application";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
+import { TimerProvider } from "./components/TimerContext";
 
 function App() {
   return (
     <UserProvider>
+      <TimerProvider>
         <Routes>
           <Route path="/" element={<LogIn />} />
           <Route path="/SignUp" element={<SignUp />} />
@@ -22,6 +24,7 @@ function App() {
             }
           />
         </Routes>
+      </TimerProvider>
     </UserProvider>
   );
 }

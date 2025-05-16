@@ -20,12 +20,14 @@ import {
 import { FaCheckCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { UserContext } from "./UserContext";
+import { TimerContext } from "./TimerContext";
 
 function Application() {
   const { coins, lastFed, foodInventory, feedPet } = useContext(UserContext);
   const [goals, setGoals] = useState([]);
   const [isBouncing, setIsBouncing] = useState(false);
   const [snackbar, setSnackbar] = useState(false);
+  const { remainingTime, formatTime } = useContext(TimerContext);
 
   // ✅ Fetch goals from the backend
   useEffect(() => {
@@ -250,7 +252,7 @@ function Application() {
           </Card>
         </Grid>
       </Grid>
-
+      <p>Remaining Time: {formatTime(remainingTime)}</p>
       {/* ✅ Footer */}
       <Box sx={{ width: "100%", maxWidth: 900 }}>
         <MainFooter goals={goals} setGoals={setGoals} />
