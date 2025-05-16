@@ -7,13 +7,21 @@ import { TimerContext } from "./TimerContext";
 
 function OptionsMenu() {
   const navigate = useNavigate();
-  const { isLoggedIn, logOutUser, username } = useContext(UserContext);
+  const { isLoggedIn, logOutUser, username, token } = useContext(UserContext);
 
   const [timeLimit, setTimeLimit] = useState(0); // Minutes
   const [timeExceeded, setTimeExceeded] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const { remainingTime, setRemainingTime, formatTime } =
     useContext(TimerContext);
+
+  // ✅ State for Change Password Modal
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // ✅ Fetch time limit from the server when the component mounts
   useEffect(() => {
@@ -78,13 +86,9 @@ function OptionsMenu() {
 
     // 🔄 Convert to milliseconds and update both local and global state
     const milliseconds = minutes * 60 * 1000;
-    setRemainingTime(milliseconds); // <-- This updates the global context
+    setRemainingTime(milliseconds);
 
     if (username) {
-      console.log(
-        `🔥 Sending PUT to /api/options/${username} with timeLimit: ${minutes}`
-      );
-
       axios
         .put(`http://localhost:3001/api/options/${username}`, {
           timeLimit: minutes,
@@ -94,9 +98,6 @@ function OptionsMenu() {
         })
         .catch((error) => {
           console.error("❌ Error updating time limit:", error.message);
-          if (error.response) {
-            console.error("❌ Backend response:", error.response.data);
-          }
         });
     } else {
       console.error("❌ Username not found in context.");
@@ -128,6 +129,88 @@ function OptionsMenu() {
     }
   };
 
+  // ✅ Change Password Handlers
+  const handleOpenPasswordModal = () => setShowPasswordModal(true);
+  const handleClosePasswordModal = () => {
+    setShowPasswordModal(false);
+    setCurrentPassword("");
+    setNewPassword("");
+    setPasswordError("");
+    setPasswordSuccess("");
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      setPasswordError("All fields are required.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/api/auth/changePassword",
+        {
+          currentPassword,
+          newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setPasswordSuccess("Password updated successfully!");
+        setTimeout(() => handleClosePasswordModal(), 1500);
+      }
+    } catch (error) {
+      console.error("❌ Error updating password:", error.message);
+      setPasswordError("Failed to update password. Check your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Render Password Modal
+  const renderPasswordModal = () => (
+    <div className={classes.modalOverlay}>
+      <div className={classes.modalContent}>
+        <h3>Change Password</h3>
+        <input
+          type="password"
+          placeholder="Current Password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          className={classes.modalInput}
+        />
+        <input
+          type="password"
+          placeholder="New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className={classes.modalInput}
+        />
+        {passwordError && <p className={classes.error}>{passwordError}</p>}
+        {passwordSuccess && (
+          <p className={classes.success}>{passwordSuccess}</p>
+        )}
+        <button onClick={handleChangePassword} className={classes.modalButton}>
+          Update Password
+        </button>
+        <button
+          onClick={handleClosePasswordModal}
+          className={classes.modalButton}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
   return (
     <div className={classes.menuContainer}>
       <h2>Options Menu</h2>
@@ -161,7 +244,12 @@ function OptionsMenu() {
           </button>
         </li>
         <li>
-          <button className={classes.menuButton}>Change Password</button>
+          <button
+            onClick={handleOpenPasswordModal}
+            className={classes.menuButton}
+          >
+            Change Password
+          </button>
         </li>
         <li>
           <button className={classes.menuButton}>Privacy Settings</button>
@@ -170,6 +258,9 @@ function OptionsMenu() {
           <button className={classes.menuButton}>View Profile</button>
         </li>
       </ul>
+
+      {/* Render the password modal if it's open */}
+      {showPasswordModal && renderPasswordModal()}
     </div>
   );
 }
