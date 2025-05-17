@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import {
   List,
   ListItem,
@@ -22,7 +22,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import DayRenderer from "./DayRenderer";
 import dayjs from "dayjs";
-import { UserContext } from "./UserContext"; // ✅ Import UserContext
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addTenCoins,
+  removeTenCoins,
+  updateCoinsOnServer,
+} from "../redux/coinsSlice";
 
 const GoalList = ({
   goals,
@@ -40,9 +45,9 @@ const GoalList = ({
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
-
-  // ✅ Import addCoins and removeCoins from your UserContext
-  const { addCoins, removeCoins } = useContext(UserContext);
+  const token = localStorage.getItem("token");
+  const dispatch = useDispatch();
+  const coins = useSelector((state) => state.coins.amount);
 
   // ✅ Open Modal
   const handleOpenModal = (goal) => {
@@ -56,7 +61,7 @@ const GoalList = ({
     setSelectedGoal(null);
   };
 
-  // ✅ Handle Checkbox change (Add or Remove Coins)
+  // ✅ Handle Checkbox change (Add or Remove 10 Coins using Redux)
   const handleCheckboxChange = (goal) => {
     handleToggleGoal(goal.id);
 
@@ -64,12 +69,14 @@ const GoalList = ({
 
     if (goal.history.includes(today)) {
       // ✅ Unchecked => Remove 10 Coins
-      removeCoins(10);
+      dispatch(removeTenCoins());
+      dispatch(updateCoinsOnServer({ amount: coins - 10, token }));
       setSnackbarMessage("💔 10 Coins Removed!");
       setAlertSeverity("error");
     } else {
       // ✅ Checked => Add 10 Coins
-      addCoins(10);
+      dispatch(addTenCoins());
+      dispatch(updateCoinsOnServer({ amount: coins + 10, token }));
       setSnackbarMessage("🎉 10 Coins Added!");
       setAlertSeverity("success");
     }
@@ -211,6 +218,7 @@ const GoalList = ({
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
       <Dialog open={open} onClose={handleCloseModal}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
@@ -225,7 +233,7 @@ const GoalList = ({
           </Button>
           <Button
             onClick={() => {
-              handleDeleteGoal(selectedGoal.id); // <-- Call the delete function
+              handleDeleteGoal(selectedGoal.id);
               handleCloseModal();
             }}
             color="error"

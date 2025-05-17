@@ -1,5 +1,4 @@
-import React, { useContext, useState } from "react";
-import { UserContext } from "./UserContext";
+import React, { useState } from "react";
 import {
   Typography,
   List,
@@ -9,9 +8,15 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { removeCoins, updateCoinsOnServer } from "../redux/coinsSlice";
+import { addFood } from "../redux/foodInventorySlice"; // ✅ Import Redux action
 
-function Store() {
-  const { coins, removeCoins, addFoodToInventory } = useContext(UserContext);
+const Store = () => {
+  const dispatch = useDispatch();
+  const coins = useSelector((state) => state.coins.amount);
+  const token = localStorage.getItem("token");
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -27,10 +32,17 @@ function Store() {
     { id: 6, name: "Chicken", price: 10 },
   ];
 
+  // ✅ Handle Purchase and Coin Deduction
   const handlePurchase = (item) => {
     if (coins >= item.price) {
-      removeCoins(item.price);
-      addFoodToInventory(item.name); // ✅ Add to inventory
+      // ✅ Remove coins via Redux
+      dispatch(removeCoins(item.price));
+      dispatch(updateCoinsOnServer({ amount: coins - item.price, token }));
+
+      // ✅ Add to Redux Inventory
+      dispatch(addFood(item.name));
+
+      // ✅ Snackbar Notification
       setSnackbar({
         open: true,
         message: `You successfully purchased ${item.name}!`,
@@ -45,6 +57,7 @@ function Store() {
     }
   };
 
+  // ✅ Close Snackbar
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -101,6 +114,6 @@ function Store() {
       </Snackbar>
     </Box>
   );
-}
+};
 
 export default Store;

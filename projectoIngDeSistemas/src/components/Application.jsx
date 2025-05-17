@@ -16,18 +16,35 @@ import {
   Grid,
   Button,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import { FaCheckCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { UserContext } from "./UserContext";
 import { TimerContext } from "./TimerContext";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCoins } from "../redux/coinsSlice";
+import { removeFood } from "../redux/foodInventorySlice";
 
 function Application() {
-  const { coins, lastFed, foodInventory, feedPet } = useContext(UserContext);
+  const { lastFed } = useContext(UserContext);
   const [goals, setGoals] = useState([]);
   const [isBouncing, setIsBouncing] = useState(false);
   const [snackbar, setSnackbar] = useState(false);
+  const [openTimerSnackbar, setOpenTimerSnackbar] = useState(false); // ✅ Timer Alert
   const { remainingTime, formatTime } = useContext(TimerContext);
+  const foodInventory = useSelector((state) => state.foodInventory.items);
+
+  // ✅ Redux state and dispatch
+  const dispatch = useDispatch();
+  const coins = useSelector((state) => state.coins.amount);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchCoins(token));
+    }
+  }, [token, dispatch]);
 
   // ✅ Fetch goals from the backend
   useEffect(() => {
@@ -58,7 +75,26 @@ function Application() {
 
   // ✅ Handle Click to Feed Pet
   const handleFeedClick = (food) => {
-    feedPet(food);
+    dispatch(removeFood(food)); // ✅ Remove from Redux
+    setIsBouncing(true); // ✅ Trigger animation
+    setSnackbar(true); // ✅ Show snackbar
+    setTimeout(() => {
+      setIsBouncing(false);
+      setSnackbar(false);
+    }, 1000);
+  };
+
+  // ✅ Trigger Alert when Time Runs Out
+  useEffect(() => {
+    if (remainingTime === 0) {
+      setOpenTimerSnackbar(true);
+    }
+  }, [remainingTime]);
+
+  // ✅ Close Timer Snackbar
+  const handleCloseTimerSnackbar = (_, reason) => {
+    if (reason === "clickaway") return;
+    setOpenTimerSnackbar(false);
   };
 
   return (
@@ -138,6 +174,7 @@ function Application() {
             </Box>
           </Card>
         </Grid>
+
         {/* ✅ Pet Card */}
         <Grid item xs={12} md={4}>
           <motion.div
@@ -194,65 +231,26 @@ function Application() {
             </Alert>
           )}
         </Grid>
-
-        {/* ✅ Goals List */}
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{
-              borderRadius: 4,
-              overflow: "hidden",
-              boxShadow: 4,
-              height: "100%",
-              background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
-            }}
-          >
-            <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  mb: 2,
-                  color: "#1976d2",
-                  fontWeight: "bold",
-                }}
-              >
-                Goal List
-              </Typography>
-            </CardContent>
-            <Divider />
-            <List sx={{ padding: "10px 20px" }}>
-              {goals.length > 0 ? (
-                goals.map((goal) => (
-                  <ListItem
-                    key={goal.id}
-                    sx={{
-                      padding: "10px 0",
-                      transition: "0.3s",
-                      "&:hover": {
-                        backgroundColor: "#f5f5f5",
-                        borderRadius: 2,
-                        cursor: "pointer",
-                      },
-                    }}
-                  >
-                    <ListItemIcon>
-                      <FaCheckCircle style={{ color: "#4CAF50" }} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={goal.name}
-                      secondary={`Streak: ${goal.history.length}`}
-                    />
-                  </ListItem>
-                ))
-              ) : (
-                <Typography color="textSecondary" sx={{ mt: 2 }}>
-                  No goals found.
-                </Typography>
-              )}
-            </List>
-          </Card>
-        </Grid>
       </Grid>
+
       <p>Remaining Time: {formatTime(remainingTime)}</p>
+
+      {/* ✅ Timer Alert */}
+      <Snackbar
+        open={openTimerSnackbar}
+        autoHideDuration={5000}
+        onClose={handleCloseTimerSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseTimerSnackbar}
+          severity="warning"
+          sx={{ width: "100%" }}
+        >
+          ⏰ Your time is up! Please take a break.
+        </Alert>
+      </Snackbar>
+
       {/* ✅ Footer */}
       <Box sx={{ width: "100%", maxWidth: 900 }}>
         <MainFooter goals={goals} setGoals={setGoals} />
