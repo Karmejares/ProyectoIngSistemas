@@ -8,14 +8,14 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-const { getGoals } = require("./data/goals");
-
 // ✅ Import routes
 const optionsRoutes = require("./routes/options");
 const usuariosRoutes = require("./routes/usuarios");
 const goalsRoutes = require("./routes/goals");
 const storeRoutes = require("./routes/store");
 const authRoutes = require("./routes/auth");
+const petInventoryRoutes = require("./routes/petInventory");
+const petRoutes = require("./routes/pet");
 
 const app = express();
 
@@ -45,6 +45,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/goals", goalsRoutes);
 app.use("/api/store", storeRoutes);
+app.use("/api/pet/inventory", petInventoryRoutes);
+app.use("/api/pet", petRoutes);
 
 // ✅ Health check route
 app.get("/", (req, res) => {

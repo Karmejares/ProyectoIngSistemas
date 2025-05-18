@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   List,
@@ -10,11 +10,12 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { removeCoins, updateCoinsOnServer } from "../redux/coinsSlice";
-import { addFood } from "../redux/foodInventorySlice"; // ✅ Import Redux action
+import { addFoodToBackend, fetchInventory } from "../redux/foodInventorySlice"; // ✅ Import Redux action
 
 const Store = () => {
   const dispatch = useDispatch();
   const coins = useSelector((state) => state.coins.amount);
+  const foodInventory = useSelector((state) => state.foodInventory.items); // 🔄 Selector for food inventory
   const token = localStorage.getItem("token");
 
   const [snackbar, setSnackbar] = useState({
@@ -40,8 +41,9 @@ const Store = () => {
       dispatch(updateCoinsOnServer({ amount: coins - item.price, token }));
 
       // ✅ Add to Redux Inventory
-      dispatch(addFood(item.name));
+      dispatch(addFoodToBackend({ foodItem: item.name, token }));
 
+      console.log("Dispatching addFoodToBackend for item:", item.name);
       // ✅ Snackbar Notification
       setSnackbar({
         open: true,
@@ -61,6 +63,9 @@ const Store = () => {
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
+  useEffect(() => {
+    dispatch(fetchInventory());
+  }, [dispatch]);
 
   return (
     <Box sx={{ p: 2 }}>

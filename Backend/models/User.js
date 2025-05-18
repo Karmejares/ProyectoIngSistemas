@@ -1,5 +1,3 @@
-// model/User.js
-
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
@@ -7,12 +5,26 @@ const UserSchema = new mongoose.Schema(
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    timeLimit: { type: String, default: "00:00" }, // Added this for time limit
+    timeLimit: { type: String, default: "00:00" },
     isLoggedIn: { type: Boolean, default: false },
     coins: {
       type: Number,
-      default: 50, // ✅ This should be 50 if not provided during creation
+      default: 50,
     },
+    foodInventory: {
+      type: [String],
+      default: [],
+    },
+    goals: [
+      {
+        title: { type: String, required: true },
+        description: { type: String, required: true },
+        plan: { type: [String], default: [] },
+        history: { type: [String], default: [] },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    lastFed: { type: Date, default: Date.now },
   },
   {
     timestamps: true,
