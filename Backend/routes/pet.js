@@ -4,13 +4,6 @@ const router = express.Router();
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// ✅ Update Last Fed Time
-// routes/pet.js
-const express = require("express");
-const router = express.Router();
-const User = require("../models/User");
-const authMiddleware = require("../middleware/authMiddleware");
-
 // ✅ Update Last Fed Time and Respond with Hunger Level
 router.put("/feed", authMiddleware, async (req, res) => {
   try {

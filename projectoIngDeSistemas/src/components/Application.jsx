@@ -167,7 +167,7 @@ function Application() {
         alignItems="center"
         position={"absolute"}
         top={195}
-        right={200}
+        right={230}
       >
         <Card
           sx={{
@@ -211,7 +211,7 @@ function Application() {
             background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
             position: "absolute",
             top: 195,
-            left: 200,
+            left: 230,
             maxHeight: "500px",
           }}
         >
@@ -275,9 +275,21 @@ function Application() {
           Yum! {lastFed} was delicious! 😋
         </Alert>
       )}
-
-      <p>Remaining Time: {formatTime(remainingTime)}</p>
-
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 350,
+          right: 230,
+          backgroundColor: "#fff",
+          padding: 2,
+          borderRadius: 2,
+          boxShadow: 3,
+          zIndex: 1000,
+          width: 268,
+        }}
+      >
+        <p>Remaining Time: {formatTime(remainingTime)}</p>
+      </Box>
       {/* ✅ Timer Alert */}
       <Snackbar
         open={openTimerSnackbar}
