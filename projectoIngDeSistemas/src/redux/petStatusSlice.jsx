@@ -8,6 +8,7 @@ const initialState = {
 };
 
 // 🔄 Fetch hunger level and last fed time from the backend
+
 export const fetchHungerLevel = createAsyncThunk(
   "petStatus/fetchHungerLevel",
   async (_, { rejectWithValue }) => {

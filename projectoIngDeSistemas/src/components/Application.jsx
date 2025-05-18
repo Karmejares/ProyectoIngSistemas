@@ -15,8 +15,7 @@ import {
   removeFoodFromBackend,
 } from "../redux/foodInventorySlice";
 import { fetchHungerLevel, feedPet } from "../redux/petStatusSlice";
-
-import petImage from "../assets/CutePixelatedCat.png";
+import PetCard from "./PetCard";
 import { motion } from "framer-motion";
 import { LinearProgress } from "@mui/material";
 import { useContext } from "react";
@@ -24,7 +23,7 @@ import { TimerContext } from "./TimerContext";
 import { Card, CardContent, CardMedia, Chip, Divider } from "@mui/material";
 import { Grid } from "@mui/material";
 import MainFooter from "./MainFooter";
-import axios from "axios";
+
 function Application() {
   const [goals, setGoals] = useState([]);
   const [isBouncing, setIsBouncing] = useState(false);
@@ -99,10 +98,13 @@ function Application() {
       await dispatch(removeFoodFromBackend({ foodItem: food }));
 
       // 🔄 Fetch the updated inventory
-      dispatch(fetchInventory());
+      await dispatch(fetchInventory());
 
       // 🔄 Feed the pet
-      dispatch(feedPet());
+      await dispatch(feedPet());
+
+      // 🔄 Fetch the updated hunger level
+      await dispatch(fetchHungerLevel());
 
       // 🔄 Animations & Snackbars
       setIsBouncing(true);
@@ -135,6 +137,7 @@ function Application() {
       display="flex"
       flexDirection="column"
       alignItems="center"
+      justifyContent="space-evenly"
       sx={{ backgroundColor: "#f3f4f6", minHeight: "100vh", padding: 3 }}
     >
       {/* ✅ Floating Coins Display */}
@@ -154,6 +157,98 @@ function Application() {
           },
         }}
       />
+      {/* ✅ Pet Status - Aligned to the Right */}
+      <Grid
+        item
+        xs={12}
+        md={6}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        position={"absolute"}
+        top={195}
+        right={200}
+      >
+        <Card
+          sx={{
+            width: 300,
+            borderRadius: 4,
+            overflow: "hidden",
+            boxShadow: 4,
+            background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
+            height: "200px",
+          }}
+        >
+          <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
+            <Typography
+              variant="h6"
+              sx={{ mb: 2, color: "#1976d2", fontWeight: "bold" }}
+            >
+              Hunger Level
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={100 - hungerLevel}
+              sx={{ height: 10, borderRadius: 5, mt: 2, mb: 1 }}
+            />
+
+            <Typography
+              variant="subtitle1"
+              sx={{ mt: 1 }}
+            >{`Status: ${status}`}</Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+      {/* ✅ Food Inventory */}
+      <Grid item xs={12} md={4}>
+        <Card
+          sx={{
+            width: 300,
+            borderRadius: 4,
+            overflow: "hidden",
+            boxShadow: 4,
+            height: "100%",
+            background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
+            position: "absolute",
+            top: 195,
+            left: 200,
+            maxHeight: "500px",
+          }}
+        >
+          <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                mb: 2,
+                color: "#1976d2",
+                fontWeight: "bold",
+              }}
+            >
+              Food Inventory
+            </Typography>
+          </CardContent>
+          <Divider />
+          <Box sx={{ display: "flex", gap: 1, padding: 2, flexWrap: "wrap" }}>
+            {foodInventory.length > 0 ? (
+              foodInventory.map((food, index) => (
+                <Button
+                  key={index}
+                  variant="contained"
+                  size="small"
+                  color="secondary"
+                  onClick={() => handleFeedClick(food)}
+                >
+                  {food}
+                </Button>
+              ))
+            ) : (
+              <Typography sx={{ mt: 1 }} color="textSecondary">
+                No food available. Visit the store!
+              </Typography>
+            )}
+          </Box>
+        </Card>
+      </Grid>
 
       {/* ✅ Main Grid Layout */}
       <Grid
@@ -162,82 +257,8 @@ function Application() {
         justifyContent="center"
         sx={{ maxWidth: 900, marginTop: 5 }}
       >
-        {/* ✅ Food Inventory */}
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{
-              borderRadius: 4,
-              overflow: "hidden",
-              boxShadow: 4,
-              height: "100%",
-              background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
-            }}
-          >
-            <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  mb: 2,
-                  color: "#1976d2",
-                  fontWeight: "bold",
-                }}
-              >
-                Food Inventory
-              </Typography>
-            </CardContent>
-            <Divider />
-            <Box sx={{ display: "flex", gap: 1, padding: 2, flexWrap: "wrap" }}>
-              {foodInventory.length > 0 ? (
-                foodInventory.map((food, index) => (
-                  <Button
-                    key={index}
-                    variant="contained"
-                    size="small"
-                    color="secondary"
-                    onClick={() => handleFeedClick(food)}
-                  >
-                    {food}
-                  </Button>
-                ))
-              ) : (
-                <Typography sx={{ mt: 1 }} color="textSecondary">
-                  No food available. Visit the store!
-                </Typography>
-              )}
-            </Box>
-          </Card>
-        </Grid>
-        {/* ✅ Pet Status */}
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{
-              borderRadius: 4,
-              overflow: "hidden",
-              boxShadow: 4,
-              background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
-            }}
-          >
-            <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
-              <Typography
-                variant="h6"
-                sx={{ mb: 2, color: "#1976d2", fontWeight: "bold" }}
-              >
-                Hunger Level
-              </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={hungerLevel}
-                sx={{ height: 10, borderRadius: 5 }}
-              />
-              <Typography
-                variant="subtitle1"
-                sx={{ mt: 1 }}
-              >{`Status: ${status}`}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
         {/* ✅ Pet Card */}
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={5} display="flex" justifyContent="center">
           <motion.div
             animate={{
               scale: isBouncing ? 1.1 : 1,
@@ -245,46 +266,15 @@ function Application() {
             }}
             transition={{ duration: 0.5 }}
           >
-            <Card
-              sx={{
-                borderRadius: 4,
-                overflow: "hidden",
-                boxShadow: 4,
-                height: "100%",
-                background: "linear-gradient(145deg, #83a4d4, #b6fbff)",
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="300"
-                image={petImage}
-                alt="Pet"
-              />
-              <CardContent sx={{ textAlign: "center", padding: 0 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{
-                    width: "100%",
-                    borderRadius: 0,
-                    backgroundColor: "#1976d2",
-                    "&:hover": {
-                      backgroundColor: "#155a9c",
-                    },
-                  }}
-                >
-                  YOUR PET
-                </Button>
-              </CardContent>
-            </Card>
+            <PetCard />
           </motion.div>
-          {snackbar && (
-            <Alert severity="success" sx={{ mt: 2 }}>
-              Yum! {lastFed} was delicious! 😋
-            </Alert>
-          )}
         </Grid>
       </Grid>
+      {snackbar && (
+        <Alert severity="success" sx={{ mt: 2 }}>
+          Yum! {lastFed} was delicious! 😋
+        </Alert>
+      )}
 
       <p>Remaining Time: {formatTime(remainingTime)}</p>
 
