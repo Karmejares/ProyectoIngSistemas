@@ -71,6 +71,29 @@ export const removeGoal = createAsyncThunk(
   }
 );
 
+// 🔄 Update goal on backend
+export const updateGoal = createAsyncThunk(
+  "goals/updateGoal",
+  async ({ _id, title, description, plan }, { getState, rejectWithValue }) => {
+    const token = getToken(getState);
+    try {
+      const response = await axios.put(
+        `http://localhost:3001/api/goals/${_id}`,
+        { title, description, plan },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("✅ Goal updated on backend:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error updating goal:", error.message);
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 const goalsSlice = createSlice({
   name: "goals",
   initialState: {
@@ -104,8 +127,17 @@ const goalsSlice = createSlice({
         };
         state.items.push(newGoal);
       })
+      .addCase(updateGoal.fulfilled, (state, action) => {
+        const updatedGoal = action.payload;
+        const index = state.items.findIndex(
+          (goal) => goal._id === updatedGoal._id
+        );
+        if (index !== -1) {
+          state.items[index] = updatedGoal;
+        }
+      })
       .addCase(removeGoal.fulfilled, (state, action) => {
-        state.items = state.items.filter((goal) => goal.id !== action.payload);
+        state.items = state.items.filter((goal) => goal._id !== action.payload);
       });
   },
 });

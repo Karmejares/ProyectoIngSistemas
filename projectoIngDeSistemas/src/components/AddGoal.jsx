@@ -14,16 +14,30 @@ import {
   Typography,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addGoal } from "../redux/goalsSlice";
+import { useEffect } from "react";
 
-const AddGoal = ({ open, onClose, onSave, loading }) => {
+const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [plan, setPlan] = useState([]);
   const [step, setStep] = useState("");
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (goalToEdit) {
+      setTitle(goalToEdit.title);
+      setDescription(goalToEdit.description);
+      setPlan(goalToEdit.plan || []); // Use || [] for safety
+    } else {
+      // Reset form when not in edit mode
+      setTitle("");
+      setDescription("");
+      setPlan([]);
+    }
+  }, [goalToEdit]); // Re-run effect when goalToEdit changes
 
   // ✅ Validate Inputs
   const validateInputs = () => {
@@ -49,41 +63,29 @@ const AddGoal = ({ open, onClose, onSave, loading }) => {
     setPlan(plan.filter((_, i) => i !== index));
   };
 
-  // ✅ Save the goal to Redux
-  //   const handleSaveGoal = async () => {
-  //     if (validateInputs()) {
-  //       const newGoal = {
-  //         title,
-  //         description,
-  //         plan,
-  //         history: [], // Initialized empty for future achievements
-  //       };
-
-  //       try {
-  //         await dispatch(addGoal(newGoal));
-  //         await dispatch(fetchGoals()); // ✅ Sync state with backend
-  //         console.log("🎉 Goal added successfully!");
-  //       } catch (error) {
-  //         console.error("❌ Error adding goal:", error.message);
-  //       } finally {
-  //         setLoading(false);
-  //         onClose();
-  //         setTitle("");
-  //         setDescription("");
-  //         setPlan([]);
-  //         setErrors({});
-  //       }
-  //     } else {
-  //       alert("Please fill out the Title and Description!");
-  //     }
-  //   };
+  const handleSaveOrUpdate = () => {
+    if (validateInputs()) {
+      const goalData = {
+        title,
+        description,
+        plan,
+      };
+      if (goalToEdit) {
+        onUpdate({ ...goalData, _id: goalToEdit._id }); // Include ID for update
+      } else {
+        onSave({ ...goalData, history: [] }); // Add history for new goals
+      }
+    }
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Add a New Goal</DialogTitle>
+      <DialogTitle>{goalToEdit ? "Edit Goal" : "Add a New Goal"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Fill in the details for your new goal, and add steps to your plan.
+          {goalToEdit
+            ? "Edit the details of your goal and update the plan as needed."
+            : "Fill in the details for your new goal, and add steps to your plan."}
         </DialogContentText>
 
         <TextField
@@ -159,19 +161,12 @@ const AddGoal = ({ open, onClose, onSave, loading }) => {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button
-          onClick={() =>
-            onSave({
-              title,
-              description,
-              plan,
-              history: [],
-            })
-          }
+          onClick={handleSaveOrUpdate}
           variant="contained"
           color="primary"
           disabled={!title.trim() || !description.trim() || !plan.length}
         >
-          Save Goal
+          {goalToEdit ? "Update Goal" : "Save Goal"}
         </Button>
       </DialogActions>
     </Dialog>
