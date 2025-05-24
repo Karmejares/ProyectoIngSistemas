@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  List,
   ListItem,
   Box,
   Checkbox,
@@ -14,6 +13,7 @@ import {
   Collapse,
   Snackbar,
   Alert,
+  List,
 } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaListAlt } from "react-icons/fa";
@@ -23,14 +23,17 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import DayRenderer from "./DayRenderer";
 import { useDispatch, useSelector } from "react-redux";
 import { removeGoal, fetchGoals } from "../redux/goalsSlice";
-import {
+import { updateGoal,
   addTenCoins,
   removeTenCoins,
   updateCoinsOnServer,
 } from "../redux/coinsSlice";
 import axios from "axios";
+import Modal from "@mui/material/Modal"; // Import Modal from Material UI
 
+import GoalDetails from "./GoalDetails"; // Import the new GoalDetails component
 const GoalList = ({
+  AddGoal, // Add AddGoal as a prop
   deleteMode,
   handleToggleGoal,
   toggleCalendarVisibility,
@@ -39,9 +42,11 @@ const GoalList = ({
   handleCalendarDayClick,
   handleToggleCalendarVisibility,
 }) => {
-  const [selectedGoal, setSelectedGoal] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState(null); // Used for delete modal
+  const [openDeleteModal, setOpenDeleteModal] = useState(false); // State for delete modal
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [openDetailsModal, setOpenDetailsModal] = useState(false); // State for details modal
+  const [openEditModal, setOpenEditModal] = useState(false); // State for edit modal
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
   const token = localStorage.getItem("token");
@@ -49,15 +54,27 @@ const GoalList = ({
   const coins = useSelector((state) => state.coins.amount);
   const goals = useSelector((state) => state.goals?.items || []);
 
-  // ✅ Open Modal
-  const handleOpenModal = (goal) => {
+  // ✅ Open Delete Modal
+  const handleOpenDeleteModal = (goal) => {
     setSelectedGoal(goal);
-    setOpen(true);
+    setOpenDeleteModal(true);
   };
 
-  // ✅ Close Modal
-  const handleCloseModal = () => {
-    setOpen(false);
+  // ✅ Close Delete Modal
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+    setSelectedGoal(null);
+  };
+
+  // ✅ Close Details Modal
+  const handleCloseDetailsModal = () => {
+ setOpenDetailsModal(false);
+ setSelectedGoal(null);
+  };
+
+  // ✅ Close Edit Modal
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
     setSelectedGoal(null);
   };
 
@@ -134,6 +151,29 @@ const GoalList = ({
     });
   }, [dispatch]);
 
+  // ✅ Handle Update Goal (called from AddGoal in edit mode)
+  const handleUpdateGoal = async (updatedGoalData) => {
+    try {
+      await dispatch(updateGoal(updatedGoalData)).unwrap();
+      console.log("🎉 Goal updated successfully!");
+      handleCloseEditModal(); // Close the edit modal on successful update
+    } catch (error) {
+      console.error("❌ Error updating goal:", error.message);
+    }
+  };
+
+  // ✅ Handle Edit Goal (called from GoalDetails)
+  const handleEditGoal = (goal) => {
+    setSelectedGoal(goal); // Set the goal to be edited
+    setOpenEditModal(true); // Open the edit modal
+  };
+
+  // ✅ Open Details Modal
+  const handleOpenDetailsModal = (goal) => {
+    setSelectedGoal(goal);
+    setOpenDetailsModal(true);
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -166,6 +206,7 @@ const GoalList = ({
                       alignItems: "center",
                       width: "100%",
                     }}
+                    onClick={() => handleOpenDetailsModal(goal)} // Add onClick to open details modal
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Checkbox
@@ -207,7 +248,7 @@ const GoalList = ({
                       {deleteMode && (
                         <Button
                           variant="outlined"
-                          color="error"
+                          color="error" // Changed color to error for delete button
                           onClick={() => handleOpenModal(goal)}
                           size="small"
                         >
@@ -273,7 +314,9 @@ const GoalList = ({
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      <Dialog open={open} onClose={handleCloseModal}>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -282,13 +325,13 @@ const GoalList = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseModal} color="primary">
+          <Button onClick={handleCloseDeleteModal} color="primary">
             Cancel
           </Button>
           <Button
             onClick={() => {
               handleDeleteGoal(selectedGoal._id);
-              handleCloseModal();
+              handleCloseDeleteModal();
             }}
             color="error"
           >
@@ -296,6 +339,31 @@ const GoalList = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Goal Details Modal */}
+      <Modal
+        open={openDetailsModal}
+        onClose={handleCloseDetailsModal}
+        aria-labelledby="goal-details-modal-title"
+        aria-describedby="goal-details-modal-description"
+      >
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, width: 400 }}>
+          {selectedGoal && <GoalDetails goal={selectedGoal} onClose={handleCloseDetailsModal} onEdit={handleEditGoal} />}
+        </Box>
+      </Modal>
+
+      {/* Edit Goal Modal */}
+      <Modal
+        open={openEditModal}
+        onClose={handleCloseEditModal}
+        aria-labelledby="edit-goal-modal-title"
+        aria-describedby="edit-goal-modal-description"
+      >
+         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, width: 400 }}>
+           {/* Render AddGoal component in edit mode */}
+ {selectedGoal && AddGoal && <AddGoal goalToEdit={selectedGoal} isEditing={true} onClose={handleCloseEditModal} onUpdate={handleUpdateGoal} />}
+         </Box>
+      </Modal>
     </>
   );
 };
