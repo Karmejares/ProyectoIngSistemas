@@ -3,15 +3,20 @@ import { Box, Grid, Button, Alert, Typography } from "@mui/material";
 import GoalList from "./GoalList";
 import AddGoal from "./AddGoal"; // Import the AddGoal component
 import { useDispatch, useSelector } from "react-redux";
-import { addGoal, fetchGoals, removeGoal } from "../redux/goalsSlice";
+import {
+  addGoal,
+  fetchGoals,
+  removeGoal,
+  updateGoal,
+} from "../redux/goalsSlice";
 import axios from "axios";
 
 function CheckList() {
-  const [deleteMode, setDeleteMode] = useState(false);
   const [visibleCalendars, setVisibleCalendars] = useState({});
   const [error, setError] = useState(null);
   const [openModal, setOpenModal] = useState(false); // Modal state
   // 🔄 Redux Hooks
+  const [editGoal, setEditGoal] = useState(null);
   const dispatch = useDispatch();
   const goals = useSelector((state) => state.goals?.items || []);
   const [loading, setLoading] = useState(false);
@@ -37,11 +42,6 @@ function CheckList() {
       console.error("Error deleting goal:", error);
       setError("Failed to delete goal. Please try again.");
     });
-  };
-
-  // ✅ Toggle Delete Mode
-  const toggleDeleteMode = () => {
-    setDeleteMode((prev) => !prev);
   };
 
   // ✅ Calculate Streak
@@ -106,32 +106,51 @@ function CheckList() {
   };
 
   // ✅ Refresh Goals List After Adding New One
-  const refreshGoals = async (newGoal) => {
+  const refreshGoals = async (goalData) => {
     setLoading(true);
     const token = localStorage.getItem("token");
 
-    try {
-      console.log("🚀 Sending new goal to server...");
+    const isEdit = !!goalData._id; // check if we're editing
 
-      // ✅ Make the request with the Authorization header
-      await axios.post("http://localhost:3001/api/goals", newGoal, {
+    const url = isEdit
+      ? `http://localhost:3001/api/goals/${goalData._id}`
+      : "http://localhost:3001/api/goals";
+
+    const method = isEdit ? "put" : "post";
+
+    try {
+      console.log(`🚀 ${isEdit ? "Updating" : "Adding"} goal...`);
+
+      await axios({
+        method,
+        url,
+        data: {
+          title: goalData.title,
+          description: goalData.description,
+          plan: goalData.plan,
+        },
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log("✅ Goal added successfully!");
+      console.log(`✅ Goal ${isEdit ? "updated" : "added"} successfully!`);
 
-      // ✅ Re-fetch goals after adding
+      // ✅ Re-fetch goals after the operation
       await dispatch(fetchGoals());
     } catch (error) {
-      console.error("❌ Error adding goal:", error.message);
-      if (error.response && error.response.data) {
+      console.error(
+        `❌ Error ${isEdit ? "updating" : "adding"} goal:`,
+        error.message
+      );
+      if (error.response?.data) {
         console.error("Server response:", error.response.data);
         setError(error.response.data.message);
       } else {
-        setError("Failed to add the goal. Please try again.");
+        setError(
+          `Failed to ${isEdit ? "update" : "add"} the goal. Please try again.`
+        );
       }
     } finally {
       setLoading(false);
@@ -147,22 +166,13 @@ function CheckList() {
             ➕ Add New Goal
           </Button>
         </Grid>
-        <Grid item>
-          <Button
-            onClick={toggleDeleteMode}
-            variant="outlined"
-            color="secondary"
-          >
-            {deleteMode ? "Exit Delete Mode" : "Delete Goals"}
-          </Button>
-        </Grid>
+        <Grid item sx={{ width: "10%" }}></Grid>
       </Grid>
 
       <Box sx={{ mt: 2 }}>
         {goals.length > 0 ? (
           <GoalList
             handleToggleGoal={handleToggleGoal}
-            deleteMode={deleteMode}
             handleDeleteGoal={handleDeleteGoal}
             toggleCalendarVisibility={toggleCalendarVisibility}
             visibleCalendars={visibleCalendars}
@@ -183,7 +193,10 @@ function CheckList() {
       {/* ✅ AddGoal Modal */}
       <AddGoal
         open={openModal}
-        onClose={handleCloseModal}
+        onClose={() => {
+          setOpenModal(false);
+          setEditGoal(null);
+        }}
         onSave={refreshGoals}
         loading={loading}
       />

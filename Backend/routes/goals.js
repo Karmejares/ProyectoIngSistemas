@@ -21,7 +21,6 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 // ✅ Add a new goal
-// ✅ Add a new goal
 router.post("/", authMiddleware, async (req, res) => {
   const { title, description, plan } = req.body;
 
@@ -86,6 +85,34 @@ router.put("/:id/toggle", authMiddleware, async (req, res) => {
     res.json(goal);
   } catch (error) {
     //console.error("❌ Error toggling goal status:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// ✅ Update an existing goal
+router.put("/:id", authMiddleware, async (req, res) => {
+  const { title, description, plan } = req.body;
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const goal = user.goals.id(req.params.id);
+
+    if (!goal) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    goal.title = title;
+    goal.description = description;
+    goal.plan = plan;
+
+    await user.save();
+    res.json(goal); // return the updated goal
+  } catch (error) {
+    console.error("❌ Error updating goal:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });

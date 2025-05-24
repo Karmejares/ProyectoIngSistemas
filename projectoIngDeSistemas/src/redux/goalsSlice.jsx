@@ -129,13 +129,15 @@ const goalsSlice = createSlice({
       })
       .addCase(updateGoal.fulfilled, (state, action) => {
         const updatedGoal = action.payload;
-        const index = state.items.findIndex(goal => goal._id === updatedGoal._id);
+        const index = state.items.findIndex(
+          (goal) => goal._id === updatedGoal._id
+        );
         if (index !== -1) {
           state.items[index] = updatedGoal;
         }
       })
       .addCase(removeGoal.fulfilled, (state, action) => {
-        state.items = state.items.filter((goal) => goal.id !== action.payload);
+        state.items = state.items.filter((goal) => goal._id !== action.payload);
       });
   },
 });

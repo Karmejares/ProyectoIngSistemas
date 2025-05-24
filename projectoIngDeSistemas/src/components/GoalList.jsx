@@ -22,8 +22,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import DayRenderer from "./DayRenderer";
 import { useDispatch, useSelector } from "react-redux";
-import { removeGoal, fetchGoals } from "../redux/goalsSlice";
-import { updateGoal,
+import { updateGoal, removeGoal, fetchGoals } from "../redux/goalsSlice";
+import {
   addTenCoins,
   removeTenCoins,
   updateCoinsOnServer,
@@ -68,8 +68,8 @@ const GoalList = ({
 
   // ✅ Close Details Modal
   const handleCloseDetailsModal = () => {
- setOpenDetailsModal(false);
- setSelectedGoal(null);
+    setOpenDetailsModal(false);
+    setSelectedGoal(null);
   };
 
   // ✅ Close Edit Modal
@@ -206,7 +206,6 @@ const GoalList = ({
                       alignItems: "center",
                       width: "100%",
                     }}
-                    onClick={() => handleOpenDetailsModal(goal)} // Add onClick to open details modal
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Checkbox
@@ -216,7 +215,6 @@ const GoalList = ({
                           ) ?? false
                         }
                         onChange={() => handleCheckboxChange(goal)}
-                        disabled={deleteMode}
                       />
                       {/* {console.log("Current Goal Object:", goal)}
                       {console.log("History Field:", goal.history)} */}
@@ -239,22 +237,19 @@ const GoalList = ({
                         size="small"
                         variant="outlined"
                         color="primary"
+                        onClick={() => handleOpenDetailsModal(goal)}
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="primary"
                         onClick={() => toggleCalendarVisibility(goal._id)}
                         sx={{ display: "flex", alignItems: "center" }}
                       >
                         <FaListAlt style={{ marginRight: 4 }} /> History
                       </Button>
-
-                      {deleteMode && (
-                        <Button
-                          variant="outlined"
-                          color="error" // Changed color to error for delete button
-                          onClick={() => handleOpenModal(goal)}
-                          size="small"
-                        >
-                          Delete
-                        </Button>
-                      )}
                     </Box>
                   </Box>
 
@@ -347,8 +342,25 @@ const GoalList = ({
         aria-labelledby="goal-details-modal-title"
         aria-describedby="goal-details-modal-description"
       >
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, width: 400 }}>
-          {selectedGoal && <GoalDetails goal={selectedGoal} onClose={handleCloseDetailsModal} onEdit={handleEditGoal} />}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            width: 400,
+          }}
+        >
+          {selectedGoal && (
+            <GoalDetails
+              goal={selectedGoal}
+              onClose={handleCloseDetailsModal}
+              onEdit={handleEditGoal}
+            />
+          )}
         </Box>
       </Modal>
 
@@ -359,10 +371,28 @@ const GoalList = ({
         aria-labelledby="edit-goal-modal-title"
         aria-describedby="edit-goal-modal-description"
       >
-         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, width: 400 }}>
-           {/* Render AddGoal component in edit mode */}
- {selectedGoal && AddGoal && <AddGoal goalToEdit={selectedGoal} isEditing={true} onClose={handleCloseEditModal} onUpdate={handleUpdateGoal} />}
-         </Box>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            width: 400,
+          }}
+        >
+          {/* Render AddGoal component in edit mode */}
+          {selectedGoal && AddGoal && (
+            <AddGoal
+              goalToEdit={selectedGoal}
+              isEditing={true}
+              onClose={handleCloseEditModal}
+              onUpdate={handleUpdateGoal}
+            />
+          )}
+        </Box>
       </Modal>
     </>
   );

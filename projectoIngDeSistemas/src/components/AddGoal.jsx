@@ -83,7 +83,9 @@ const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
       <DialogTitle>{goalToEdit ? "Edit Goal" : "Add a New Goal"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Fill in the details for your new goal, and add steps to your plan.
+          {goalToEdit
+            ? "Edit the details of your goal and update the plan as needed."
+            : "Fill in the details for your new goal, and add steps to your plan."}
         </DialogContentText>
 
         <TextField
@@ -158,12 +160,13 @@ const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSaveOrUpdate}
+        <Button
+          onClick={handleSaveOrUpdate}
           variant="contained"
           color="primary"
           disabled={!title.trim() || !description.trim() || !plan.length}
         >
-          Save Goal
+          {goalToEdit ? "Update Goal" : "Save Goal"}
         </Button>
       </DialogActions>
     </Dialog>
