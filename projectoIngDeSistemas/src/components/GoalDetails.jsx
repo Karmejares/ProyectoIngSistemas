@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   IconButton,
   Typography,
   Button,
@@ -11,48 +12,34 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch } from "react-redux";
-import { removeGoal, updateGoal } from "../redux/goalsSlice"; // Adjust the import path as necessary
+import { removeGoal } from "../redux/goalsSlice";
 import AddGoal from "./AddGoal";
-import { useState } from "react";
+import { useSelector } from "react-redux";
 
-const GoalDetails = ({ goal, onClose, onEdit, onDelete }) => {
+const GoalDetails = ({ goalId, onClose }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+  // Obtiene la lista de objetivos desde el store
+  const goals = useSelector((state) => state.goals.items); // o como tengas el selector
+  console.log("Goals from Redux:", goals);
+  console.log("Goal ID:", goalId);
+  // Busca el goal actualizado por id
+  const goal = goals.find((g) => g._id === goalId);
 
   if (!goal) return null;
 
-  const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this goal?")) {
-      dispatch(removeGoal(goal._id))
-        .unwrap()
-        .then(() => {
-          onClose(); // Close modal after deletion
-        })
-        .catch((error) => {
-          console.error("Failed to delete goal:", error);
-          alert("Error deleting goal.");
-        });
-    }
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true); // ✅ Open AddGoal in edit mode
-  };
-
-  const handleCloseEdit = () => {
-    setIsEditing(false); // Close AddGoal modal
-  };
-
-  const handleUpdateGoal = (updatedGoal) => {
-    dispatch(updateGoal(updatedGoal))
+  const handleDeleteConfirm = () => {
+    dispatch(removeGoal(goal._id))
       .unwrap()
       .then(() => {
-        setIsEditing(false); // Close after update
-        onClose(); // Optionally close details too
+        setOpenDeleteDialog(false);
+        onClose();
       })
       .catch((error) => {
-        console.error("Failed to update goal:", error);
-        alert("Error updating goal.");
+        console.error("Failed to delete goal:", error);
+        alert("Error deleting goal.");
       });
   };
 
@@ -75,9 +62,9 @@ const GoalDetails = ({ goal, onClose, onEdit, onDelete }) => {
   ];
 
   const rows =
-    goal.plan?.map((desc, index) => ({
+    goal.plan?.map((step, index) => ({
       id: index + 1,
-      description: desc,
+      description: step.stepDescription || "",
     })) || [];
 
   return (
@@ -119,24 +106,55 @@ const GoalDetails = ({ goal, onClose, onEdit, onDelete }) => {
           )}
 
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-            <Button variant="outlined" color="primary" onClick={handleEdit}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => setIsEditing(true)}
+            >
               Edit
             </Button>
-            <Button variant="outlined" color="error" onClick={handleDelete}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setOpenDeleteDialog(true)}
+            >
               Delete
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-      {/* ✅ Inline AddGoal shown when editing */}
+
+      {/* Modal de edición */}
       {isEditing && (
         <AddGoal
           open={isEditing}
-          onClose={handleCloseEdit}
+          onClose={() => setIsEditing(false)}
           goalToEdit={goal}
-          onUpdate={handleUpdateGoal}
         />
       )}
+
+      {/* Modal de confirmación de borrado */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this goal?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -15,10 +15,10 @@ import {
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { addGoal } from "../redux/goalsSlice";
+import { addGoal, updateGoal, fetchGoals } from "../redux/goalsSlice";
 import { useEffect } from "react";
 
-const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
+const AddGoal = ({ open, onClose, goalToEdit }) => {
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -52,8 +52,8 @@ const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
 
   // ✅ Add a step to the plan
   const handleAddStep = () => {
-    if (step.trim() !== "") {
-      setPlan([...plan, step]);
+    if (step.trim()) {
+      setPlan([...plan, { stepDescription: step.trim(), date: null }]);
       setStep("");
     }
   };
@@ -63,19 +63,33 @@ const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
     setPlan(plan.filter((_, i) => i !== index));
   };
 
-  const handleSaveOrUpdate = () => {
-    if (validateInputs()) {
-      const goalData = {
-        title,
-        description,
-        plan,
-      };
+  const handleSaveOrUpdate = async () => {
+    if (!validateInputs()) return;
+
+    const normalizedPlan = plan.map((p) => ({
+      stepDescription: typeof p === "string" ? p : p.stepDescription || "",
+      date: p.date || null,
+    }));
+
+    const goalData = {
+      title: title.trim(),
+      description: description.trim(),
+      plan: normalizedPlan,
+      history: goalToEdit ? goalToEdit.history || [] : [],
+    };
+    try {
       if (goalToEdit) {
-        onUpdate({ ...goalData, _id: goalToEdit._id }); // Include ID for update
+        // Actualizar goal existente
+        await dispatch(updateGoal({ ...goalData, _id: goalToEdit._id }));
       } else {
-        onSave({ ...goalData, history: [] }); // Add history for new goals
+        // Crear nuevo goal
+        await dispatch(addGoal(goalData));
       }
+      onClose(); // Cerrar el modal después de guardar
+    } catch (error) {
+      console.error("Error saving goal:", error);
     }
+    await dispatch(fetchGoals()); // ← opcional para actualizar la lista
   };
 
   return (
@@ -126,7 +140,7 @@ const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
             fullWidth
             value={step}
             onChange={(e) => setStep(e.target.value)}
-            helperText="Create a timeline for your goal"
+            helperText="Create a timeline for your goal. Each step will be assigned a completion date when you mark it as done."
           />
           <IconButton
             color="primary"
@@ -136,7 +150,6 @@ const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
             <Add />
           </IconButton>
         </Box>
-
         <List>
           {plan.map((item, index) => (
             <ListItem
@@ -147,7 +160,7 @@ const AddGoal = ({ open, onClose, onSave, onUpdate, goalToEdit, loading }) => {
                 </IconButton>
               }
             >
-              <Typography>{item}</Typography>
+              <Typography>{item.stepDescription}</Typography>
             </ListItem>
           ))}
         </List>

@@ -54,12 +54,6 @@ const GoalList = ({
   const coins = useSelector((state) => state.coins.amount);
   const goals = useSelector((state) => state.goals?.items || []);
 
-  // ✅ Open Delete Modal
-  const handleOpenDeleteModal = (goal) => {
-    setSelectedGoal(goal);
-    setOpenDeleteModal(true);
-  };
-
   // ✅ Close Delete Modal
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
@@ -81,7 +75,7 @@ const GoalList = ({
   // ✅ Handle Checkbox change (Add or Remove 10 Coins using Redux)
   const handleCheckboxChange = (goal) => {
     //console.log("Goal object received:", goal); // Check the full object
-    //console.log("Goal ID:", goal._id); // Check if _id is actually present
+    console.log("Goal ID:", goal._id); // Check if _id is actually present
     if (!handleToggleGoal) {
       //console.error("❌ handleToggleGoal is not passed from parent!");
       return;
@@ -118,7 +112,7 @@ const GoalList = ({
     const token = localStorage.getItem("token");
 
     try {
-      console.log(`Attempting to delete goal: ${goalId}`);
+      //console.log(`Attempting to delete goal: ${goalId}`);
 
       // Send delete request to the backend
       await axios.delete(`http://localhost:3001/api/goals/${goalId}`, {
@@ -128,7 +122,7 @@ const GoalList = ({
         },
       });
 
-      console.log("🗑️ Goal deleted successfully!");
+      //console.log("🗑️ Goal deleted successfully!");
 
       // ✅ Refetch the goals from the backend
       dispatch(fetchGoals());
@@ -147,7 +141,7 @@ const GoalList = ({
   // ✅ Fetch goals when component mounts
   useEffect(() => {
     dispatch(fetchGoals()).then((response) => {
-      console.log("Goals fetched from Redux state:", response.payload);
+      //console.log("Goals fetched from Redux state:", response.payload);
     });
   }, [dispatch]);
 
@@ -354,9 +348,11 @@ const GoalList = ({
             width: 400,
           }}
         >
+          {/* {console.log("Selected Goal for Details:", selectedGoal)} */}
+          {console.log("Selected Goal ID:", selectedGoal?._id)}
           {selectedGoal && (
             <GoalDetails
-              goal={selectedGoal}
+              goalId={selectedGoal._id}
               onClose={handleCloseDetailsModal}
               onEdit={handleEditGoal}
             />
@@ -386,7 +382,7 @@ const GoalList = ({
           {/* Render AddGoal component in edit mode */}
           {selectedGoal && AddGoal && (
             <AddGoal
-              goalToEdit={selectedGoal}
+              goalToEdit={selectedGoal._id}
               isEditing={true}
               onClose={handleCloseEditModal}
               onUpdate={handleUpdateGoal}

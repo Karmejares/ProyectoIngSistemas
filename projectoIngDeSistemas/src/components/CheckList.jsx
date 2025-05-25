@@ -3,12 +3,7 @@ import { Box, Grid, Button, Alert, Typography } from "@mui/material";
 import GoalList from "./GoalList";
 import AddGoal from "./AddGoal"; // Import the AddGoal component
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addGoal,
-  fetchGoals,
-  removeGoal,
-  updateGoal,
-} from "../redux/goalsSlice";
+import { fetchGoals, removeGoal } from "../redux/goalsSlice";
 import axios from "axios";
 
 function CheckList() {
@@ -101,63 +96,6 @@ function CheckList() {
   };
 
   // ✅ Close Modal
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
-
-  // ✅ Refresh Goals List After Adding New One
-  const refreshGoals = async (goalData) => {
-    setLoading(true);
-    const token = localStorage.getItem("token");
-
-    const isEdit = !!goalData._id; // check if we're editing
-
-    const url = isEdit
-      ? `http://localhost:3001/api/goals/${goalData._id}`
-      : "http://localhost:3001/api/goals";
-
-    const method = isEdit ? "put" : "post";
-
-    try {
-      console.log(`🚀 ${isEdit ? "Updating" : "Adding"} goal...`);
-
-      await axios({
-        method,
-        url,
-        data: {
-          title: goalData.title,
-          description: goalData.description,
-          plan: goalData.plan,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      console.log(`✅ Goal ${isEdit ? "updated" : "added"} successfully!`);
-
-      // ✅ Re-fetch goals after the operation
-      await dispatch(fetchGoals());
-    } catch (error) {
-      console.error(
-        `❌ Error ${isEdit ? "updating" : "adding"} goal:`,
-        error.message
-      );
-      if (error.response?.data) {
-        console.error("Server response:", error.response.data);
-        setError(error.response.data.message);
-      } else {
-        setError(
-          `Failed to ${isEdit ? "update" : "add"} the goal. Please try again.`
-        );
-      }
-    } finally {
-      setLoading(false);
-      handleCloseModal();
-    }
-  };
-
   return (
     <Box sx={{ padding: 2 }}>
       <Grid container spacing={2} alignItems="center">
@@ -197,7 +135,6 @@ function CheckList() {
           setOpenModal(false);
           setEditGoal(null);
         }}
-        onSave={refreshGoals}
         loading={loading}
       />
     </Box>
