@@ -48,6 +48,26 @@ export const addGoal = createAsyncThunk(
   }
 );
 
+// 🔄 Update step date in backend
+export const updateStepDate = createAsyncThunk(
+  "goals/updateStepDate",
+  async ({ goalId, stepId, date }, { getState, rejectWithValue }) => {
+    const token = getToken(getState);
+    try {
+      const response = await axios.patch(
+        `http://localhost:3001/api/goals/${goalId}/plan/step/${stepId}`,
+        { date },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // 🔄 Remove goal from backend
 export const removeGoal = createAsyncThunk(
   "goals/removeGoal",

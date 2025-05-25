@@ -60,37 +60,30 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 // ✅ Add the date to a step of a goal
-router.put(
-  "/:goalId/steps/:stepId/toggle",
-  authMiddleware,
-  async (req, res) => {
-    const { goalId, stepId } = req.params;
 
-    try {
-      const user = await User.findById(req.user.id);
-      if (!user) return res.status(404).json({ message: "User not found" });
+router.patch("/:goalId/plan/step/:stepId", authMiddleware, async (req, res) => {
+  const { goalId, stepId } = req.params;
+  const { date } = req.body;
 
-      const goal = user.goals.id(goalId);
-      if (!goal) return res.status(404).json({ message: "Goal not found" });
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-      const step = goal.plan.id(stepId);
-      if (!step) return res.status(404).json({ message: "Step not found" });
+    const goal = user.goals.id(goalId);
+    if (!goal) return res.status(404).json({ message: "Goal not found" });
 
-      // Toggle: si ya tiene fecha, la borra; si no tiene, le asigna una
-      if (step.date) {
-        step.date = null;
-      } else {
-        step.date = new Date();
-      }
+    const step = goal.plan.id(stepId);
+    if (!step) return res.status(404).json({ message: "Step not found" });
 
-      await user.save();
-      res.json({ message: "Step status toggled", step });
-    } catch (error) {
-      console.error("❌ Error toggling step:", error.message);
-      res.status(500).json({ message: "Server Error" });
-    }
+    step.date = date;
+
+    await user.save(); // Guarda cambios en el documento user
+    res.json({ step });
+  } catch (error) {
+    console.error("❌ Error updating step date:", error);
+    res.status(500).json({ message: "Server Error" });
   }
-);
+});
 
 // ✅ Toggle goal history
 router.put("/:id/toggle", authMiddleware, async (req, res) => {

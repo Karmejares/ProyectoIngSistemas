@@ -12,7 +12,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch } from "react-redux";
-import { removeGoal } from "../redux/goalsSlice";
+import { removeGoal, updateStepDate } from "../redux/goalsSlice";
 import AddGoal from "./AddGoal";
 import { useSelector } from "react-redux";
 
@@ -20,6 +20,7 @@ const GoalDetails = ({ goalId, onClose }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [refreshFlag, setRefreshFlag] = useState(false);
 
   // Obtiene la lista de objetivos desde el store
   const goals = useSelector((state) => state.goals.items); // o como tengas el selector
@@ -29,6 +30,13 @@ const GoalDetails = ({ goalId, onClose }) => {
   const goal = goals.find((g) => g._id === goalId);
 
   if (!goal) return null;
+
+  const handleCheckboxClick = (stepId) => {
+    const date = new Date().toISOString();
+    dispatch(updateStepDate({ goalId: goal._id, stepId, date }))
+      .unwrap()
+      .then(() => setRefreshFlag((prev) => !prev)); // <-- fuerza rerender
+  };
 
   const handleDeleteConfirm = () => {
     dispatch(removeGoal(goal._id))
@@ -57,14 +65,50 @@ const GoalDetails = ({ goalId, onClose }) => {
       field: "description",
       headerName: "Description",
       flex: 1,
-      width: 150,
+      width: 250,
+    },
+    {
+      field: "completed",
+      headerName: "Completed",
+      width: 120,
+      renderCell: (params) => {
+        const { stepId, date } = params.row;
+        return (
+          <input
+            type="checkbox"
+            checked={!!date}
+            onChange={() => {
+              if (!date) {
+                handleCheckboxClick(stepId); // Solo marca si no está ya completado
+              }
+            }}
+          />
+        );
+      },
+    },
+    {
+      field: "date",
+      headerName: "Completion Date",
+      width: 180,
+      renderCell: (params) => {
+        const value = params.value;
+        return value ? (
+          new Date(value).toLocaleString()
+        ) : (
+          <span style={{ color: "#1976d2", fontWeight: "bold" }}>
+            You can do it!
+          </span>
+        );
+      },
     },
   ];
 
   const rows =
     goal.plan?.map((step, index) => ({
       id: index + 1,
+      stepId: step._id, // necesario para actualizarlo
       description: step.stepDescription || "",
+      date: step.date, // muestra si ya tiene fecha
     })) || [];
 
   return (
@@ -98,7 +142,6 @@ const GoalDetails = ({ goalId, onClose }) => {
                   autoHeight
                   rows={rows}
                   columns={columns}
-                  checkboxSelection
                   disableRowSelectionOnClick
                 />
               </Paper>
