@@ -21,6 +21,7 @@ const GoalDetails = ({ goalId, onClose }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [optimisticSteps, setOptimisticSteps] = useState({});
 
   // Obtiene la lista de objetivos desde el store
   const goals = useSelector((state) => state.goals.items); // o como tengas el selector
@@ -31,11 +32,28 @@ const GoalDetails = ({ goalId, onClose }) => {
 
   if (!goal) return null;
 
-  const handleCheckboxClick = (stepId) => {
+  const handleCheckboxClick = async (stepId) => {
     const date = new Date().toISOString();
-    dispatch(updateStepDate({ goalId: goal._id, stepId, date }))
-      .unwrap()
-      .then(() => setRefreshFlag((prev) => !prev)); // <-- fuerza rerender
+
+    // Mark as complete locally
+    setOptimisticSteps((prev) => ({ ...prev, [stepId]: date }));
+
+    try {
+      await dispatch(
+        updateStepDate({ goalId: goal._id, stepId, date })
+      ).unwrap();
+      setRefreshFlag((prev) => !prev); // reload from Redux
+    } catch (error) {
+      console.error("Failed to update step date:", error);
+      alert("Failed to mark step as complete.");
+
+      // Roll back optimistic update
+      setOptimisticSteps((prev) => {
+        const newState = { ...prev };
+        delete newState[stepId];
+        return newState;
+      });
+    }
   };
 
   const handleDeleteConfirm = () => {
@@ -73,27 +91,33 @@ const GoalDetails = ({ goalId, onClose }) => {
       width: 120,
       renderCell: (params) => {
         const { stepId, date } = params.row;
+        const isChecked = !!date || !!optimisticSteps[stepId];
+
         return (
           <input
             type="checkbox"
-            checked={!!date}
+            checked={isChecked}
+            disabled={!!date}
             onChange={() => {
-              if (!date) {
-                handleCheckboxClick(stepId); // Solo marca si no está ya completado
+              if (!date && !optimisticSteps[stepId]) {
+                handleCheckboxClick(stepId);
               }
             }}
           />
         );
       },
     },
+
     {
       field: "date",
       headerName: "Completion Date",
       width: 180,
       renderCell: (params) => {
-        const value = params.value;
-        return value ? (
-          new Date(value).toLocaleString()
+        const { stepId, date } = params.row;
+        const displayDate = optimisticSteps[stepId] || date;
+
+        return displayDate ? (
+          new Date(displayDate).toLocaleString()
         ) : (
           <span style={{ color: "#1976d2", fontWeight: "bold" }}>
             You can do it!
@@ -139,6 +163,7 @@ const GoalDetails = ({ goalId, onClose }) => {
               </Typography>
               <Paper sx={{ height: 300, width: "100%", mb: 2 }}>
                 <DataGrid
+                  key={refreshFlag}
                   autoHeight
                   rows={rows}
                   columns={columns}
