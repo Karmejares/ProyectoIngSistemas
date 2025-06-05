@@ -1,24 +1,22 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
 
 function LogIn() {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm();
   const [error, setError] = useState("");
-  const { logInUser } = useContext(UserContext); // Access logInUser from context
+  const { logInUser } = useContext(UserContext);
   const navigate = useNavigate();
 
-  // ✅ Handle form input change
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // ✅ Handle form submission
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError(""); // Clear previous errors
+  const onSubmit = async (data) => {
+    setError("");
 
     try {
       const response = await fetch("http://localhost:3001/api/auth/login", {
@@ -26,7 +24,7 @@ function LogIn() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -34,16 +32,12 @@ function LogIn() {
         throw new Error(errorData.message || "Login failed");
       }
 
-      // ✅ Successful login
-      const data = await response.json();
-      const token = data.token;
-
-      // ✅ Update context and store token
-      logInUser(token); // Pass the token to the context
-      navigate("/Application"); // Redirect to the application page
+      const responseData = await response.json();
+      logInUser(responseData.token);
+      navigate("/Application");
     } catch (err) {
       setError(err.message);
-      console.log("Login error:", err.message);
+      console.error("Login error:", err.message);
     }
   };
 
@@ -71,27 +65,32 @@ function LogIn() {
           Log In
         </Typography>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
             label="Username"
             type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
             fullWidth
             margin="normal"
-            required
+            error={!!errors.username}
+            helperText={errors.username?.message}
+            {...register("username", { required: "Username is required" })}
           />
+
           <TextField
             label="Password"
             type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
             fullWidth
             margin="normal"
-            required
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            {...register("password", {
+              required: {
+                value: true,
+                message: "Password is required",
+              },
+            })}
           />
+
           <Button
             type="submit"
             variant="contained"
@@ -110,7 +109,7 @@ function LogIn() {
         )}
 
         <Typography sx={{ mt: 2, textAlign: "center" }}>
-          Don't have an account?{" "}
+          Don&#39;t have an account?{" "}
           <Link
             to="/SignUp"
             style={{ textDecoration: "none", color: "#1976d2" }}
