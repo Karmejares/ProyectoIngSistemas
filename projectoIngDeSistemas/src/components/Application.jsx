@@ -23,6 +23,21 @@ import { TimerContext } from "./TimerContext";
 import { Card, CardContent, CardMedia, Chip, Divider } from "@mui/material";
 import { Grid } from "@mui/material";
 import MainFooter from "./MainFooter";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+
+// Match food names to icons
+const foodIcons = {
+  Fish: "https://lottie.host/72ec3a40-8764-4c81-b46e-6394535763e4/Z6BlFXoYGI.lottie",
+  Cookies:
+    "https://lottie.host/396df011-adb5-4497-a678-c264206c9871/QJQOKzaNiD.lottie",
+  "Wet Food":
+    "https://lottie.host/f95ed49d-7095-4b34-96d0-923683b2f3e3/Lv0ZfawpeH.lottie",
+  "Cat Food":
+    "https://lottie.host/52cec1d5-798a-4025-aac4-efd24b05117f/Lj0VsKuw6T.lottie",
+  Meat: "https://lottie.host/748c3ea7-cc6b-4c02-9b52-b852b2fb2ddb/azAVZsZZBZ.lottie",
+  Chicken:
+    "https://lottie.host/237f1138-b710-4068-bc20-2d97eac6f90e/MuWGVRcgSJ.lottie",
+};
 
 function Application() {
   const [goals, setGoals] = useState([]);
@@ -33,7 +48,7 @@ function Application() {
   const foodInventory = useSelector((state) => state.foodInventory.items);
 
   const { hungerLevel, status, lastFed } = useSelector(
-    (state) => state.petStatus
+    (state) => state.petStatus,
   );
 
   // ✅ Redux state and dispatch
@@ -132,185 +147,205 @@ function Application() {
     setOpenTimerSnackbar(false);
   };
 
+  const cardStyles = {
+    width: 300,
+    borderRadius: 4,
+    overflow: "hidden",
+    boxShadow: 4,
+    background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
+  };
+
+  const titleStyle = {
+    mb: 2,
+    color: "#1976d2",
+    fontWeight: "bold",
+    textAlign: "center",
+  };
+
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="space-evenly"
-      sx={{ backgroundColor: "#f3f4f6", minHeight: "100vh", padding: 3 }}
-    >
-      {/* ✅ Floating Coins Display */}
-      <Chip
-        label={`💰 Coins: ${coins}`}
-        color="primary"
-        variant="filled"
+    <>
+      <Grid
         sx={{
-          position: "absolute",
-          top: 20,
-          right: 20,
-          fontSize: "1.2rem",
-          boxShadow: 2,
-          "&:hover": {
-            transform: "scale(1.05)",
-            transition: "0.2s",
-          },
+          marginTop: 22,
         }}
-      />
-      {/* ✅ Pet Status - Aligned to the Right */}
-      <Grid
-        item
-        xs={12}
-        md={6}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        position={"absolute"}
-        top={195}
-        right={230}
-      >
-        <Card
-          sx={{
-            width: 300,
-            borderRadius: 4,
-            overflow: "hidden",
-            boxShadow: 4,
-            background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
-            height: "200px",
-          }}
-        >
-          <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
-            <Typography
-              variant="h6"
-              sx={{ mb: 2, color: "#1976d2", fontWeight: "bold" }}
-            >
-              Hunger Level
-            </Typography>
-            <LinearProgress
-              variant="determinate"
-              value={100 - hungerLevel}
-              sx={{ height: 10, borderRadius: 5, mt: 2, mb: 1 }}
-            />
-
-            <Typography
-              variant="subtitle1"
-              sx={{ mt: 1 }}
-            >{`Status: ${status}`}</Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-      {/* ✅ Food Inventory */}
-      <Grid item xs={12} md={4}>
-        <Card
-          sx={{
-            width: 300,
-            borderRadius: 4,
-            overflow: "hidden",
-            boxShadow: 4,
-            height: "100%",
-            background: "linear-gradient(145deg, #ffffff, #e1e1e1)",
-            position: "absolute",
-            top: 195,
-            left: 230,
-            maxHeight: "500px",
-          }}
-        >
-          <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 2,
-                color: "#1976d2",
-                fontWeight: "bold",
-              }}
-            >
-              Food Inventory
-            </Typography>
-          </CardContent>
-          <Divider />
-          <Box sx={{ display: "flex", gap: 1, padding: 2, flexWrap: "wrap" }}>
-            {foodInventory.length > 0 ? (
-              foodInventory.map((food, index) => (
-                <Button
-                  key={index}
-                  variant="contained"
-                  size="small"
-                  color="secondary"
-                  onClick={() => handleFeedClick(food)}
-                >
-                  {food}
-                </Button>
-              ))
-            ) : (
-              <Typography sx={{ mt: 1 }} color="textSecondary">
-                No food available. Visit the store!
-              </Typography>
-            )}
-          </Box>
-        </Card>
-      </Grid>
-
-      {/* ✅ Main Grid Layout */}
-      <Grid
-        container
-        spacing={3}
-        justifyContent="center"
-        sx={{ maxWidth: 900, marginTop: 5 }}
-      >
-        {/* ✅ Pet Card */}
-        <Grid item xs={12} md={5} display="flex" justifyContent="center">
-          <motion.div
-            animate={{
-              scale: isBouncing ? 1.1 : 1,
-              rotate: isBouncing ? [0, 15, -15, 0] : 0,
-            }}
-            transition={{ duration: 0.5 }}
-          >
-            <PetCard />
-          </motion.div>
-        </Grid>
-      </Grid>
-      {snackbar && (
-        <Alert severity="success" sx={{ mt: 2 }}>
-          Yum! {lastFed} was delicious! 😋
-        </Alert>
-      )}
+      ></Grid>
       <Box
-        sx={{
-          position: "absolute",
-          bottom: 350,
-          right: 230,
-          backgroundColor: "#fff",
-          padding: 2,
-          borderRadius: 2,
-          boxShadow: 3,
-          zIndex: 1000,
-          width: 268,
-        }}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        sx={{ minHeight: "100vh", padding: 3 }}
       >
-        <p>Remaining Time: {formatTime(remainingTime)}</p>
-      </Box>
-      {/* ✅ Timer Alert */}
-      <Snackbar
-        open={openTimerSnackbar}
-        autoHideDuration={5000}
-        onClose={handleCloseTimerSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseTimerSnackbar}
-          severity="warning"
-          sx={{ width: "100%" }}
-        >
-          ⏰ Your time is up! Please take a break.
-        </Alert>
-      </Snackbar>
+        {/* Coins in top-right corner */}
+        <Chip
+          label={`💰 Coins: ${coins}`}
+          color="primary"
+          sx={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            fontSize: "1.2rem",
+            backgroundColor: "#ffd54f", // Gold
+            color: "#000", // For contrast
+            boxShadow: 2,
+            "&:hover": {
+              transform: "scale(1.05)",
+              transition: "0.2s",
+            },
+          }}
+        />
 
-      {/* ✅ Footer */}
-      <Box sx={{ width: "100%", maxWidth: 900 }}>
+        {/* ✅ Main layout row */}
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="flex-start"
+          flexWrap="wrap"
+          gap={3}
+          sx={{ mt: 4, mb: 6 }}
+        >
+          {/* Food Inventory */}
+          <Card sx={cardStyles}>
+            <CardContent>
+              <Typography variant="h6" sx={titleStyle}>
+                Food Inventory
+              </Typography>
+            </CardContent>
+            <Divider />
+            <Box sx={{ display: "flex", gap: 1, padding: 2, flexWrap: "wrap" }}>
+              {console.log(foodInventory)}
+              {foodInventory.length > 0 ? (
+                foodInventory.map((food, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => handleFeedClick(food)}
+                    sx={{
+                      backgroundColor: "#F06292", // Candy pink
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#ec407a",
+                      },
+                      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+                      borderRadius: "16px",
+                      padding: "8px",
+                      minWidth: 80,
+                      minHeight: 100,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 0.5,
+                      textTransform: "none", // keeps the text like "Cookies" instead of "COOKIES"
+                    }}
+                  >
+                    <DotLottieReact
+                      src={foodIcons[food]}
+                      autoplay
+                      loop
+                      style={{ width: 50, height: 50 }}
+                    />
+                    {food}
+                  </Button>
+                ))
+              ) : (
+                <Typography sx={{ mt: 1 }} color="textSecondary">
+                  No food available. Visit the store!
+                </Typography>
+              )}
+            </Box>
+          </Card>
+
+          {/* Pet Card */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#f5f5f5",
+              borderRadius: 4,
+              boxShadow: 3,
+              border: "2px solid #d0e3e8",
+              position: "relative", // for overlays if needed\
+              padding: 3,
+            }}
+          >
+            <Card sx={cardStyles}>
+              <motion.div
+                animate={{
+                  scale: isBouncing ? 1.1 : 1,
+                  rotate: isBouncing ? [0, 15, -15, 0] : 0,
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                <PetCard />
+              </motion.div>
+            </Card>
+          </Box>
+          {/* Hunger Level + Timer */}
+          <Card sx={cardStyles}>
+            <CardContent sx={{ textAlign: "center", paddingBottom: 0 }}>
+              <Typography variant="h6" sx={titleStyle}>
+                Hunger Level
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={100 - hungerLevel}
+                sx={{
+                  height: 10,
+                  borderRadius: 5,
+                  mt: 2,
+                  mb: 1,
+                  backgroundColor: "#e0e0e0", // Track
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: "#aed581", // Fill
+                  },
+                }}
+              />
+              <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                Status: {status}
+              </Typography>
+              <Box
+                sx={{
+                  mt: 2,
+                  backgroundColor: "#fff",
+                  padding: 1,
+                  borderRadius: 2,
+                  boxShadow: 1,
+                }}
+              >
+                <Typography>
+                  Remaining Time: {formatTime(remainingTime)}
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+
+        {/* Success snackbar */}
+        {snackbar && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            Yum! {lastFed} was delicious! 😋
+          </Alert>
+        )}
+
+        {/* Timer snackbar */}
+        <Snackbar
+          open={openTimerSnackbar}
+          autoHideDuration={5000}
+          onClose={handleCloseTimerSnackbar}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleCloseTimerSnackbar}
+            severity="warning"
+            sx={{ width: "100%" }}
+          >
+            ⏰ Your time is up! Please take a break.
+          </Alert>
+        </Snackbar>
+
+        {/* Footer */}
         <MainFooter goals={goals} setGoals={setGoals} />
       </Box>
-    </Box>
+    </>
   );
 }
 

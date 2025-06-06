@@ -56,29 +56,66 @@ function MainFooter({ goals, setGoals }) {
     <>
       {isModalOpen && (
         <Modal onClose={closeModalHandler}>
-          <h2>My Goals</h2>
-          <p style={{ fontSize: "16px" }}>
-            Here you can define and track your goals!
-          </p>
-          <CheckList goals={goals} setGoals={setGoals} />
+          <Box
+            sx={{
+              backgroundColor: "#ffffff",
+              borderRadius: 3,
+              boxShadow: 3,
+              padding: 3,
+              maxWidth: 500,
+              margin: "0 auto",
+              marginRight: 2.5,
+            }}
+          >
+            <h2>My Goals</h2>
+            <p style={{ fontSize: "16px" }}>
+              Here you can define and track your goals!
+            </p>
+            <CheckList goals={goals} setGoals={setGoals} />
+          </Box>
         </Modal>
       )}
       {isOptionsModalOpen && (
         <Modal onClose={closeOptionsModalHandler}>
-          <OptionsMenu />
+          <Box sx={{ marginRight: 2.5 }}>
+            <OptionsMenu />
+          </Box>
         </Modal>
       )}
       {isStoreModalOpen && (
         <Modal onClose={closeStoreModalHandler}>
-          <Store />
+          <Box sx={{ marginRight: 2.5 }}>
+            <Store />
+          </Box>
         </Modal>
       )}
       <AppBar
-        position="static"
-        sx={{ top: "auto", bottom: 0, backgroundColor: "#333" }}
+        position="fixed"
+        sx={{
+          top: "auto",
+          bottom: 0,
+          backgroundColor: "#ffffff", // Fondo de la barra
+          boxShadow: "0 -2px 4px rgba(0, 0, 0, 0.1)", // Sombra suave arriba
+        }}
       >
-        <Toolbar sx={{ display: "flex", justifyContent: "space-around" }}>
-          <Button color="inherit" onClick={openStoreModalHandler}>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-around",
+            paddingY: 1,
+          }}
+        >
+          {/* Store */}
+          <Button
+            onClick={openStoreModalHandler}
+            size="large"
+            sx={{
+              color: "#4a9c8c", // Color de íconos y texto
+              "&:hover": {
+                backgroundColor: "#6bb5a220", // Acento con opacidad
+              },
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
@@ -91,20 +128,35 @@ function MainFooter({ goals, setGoals }) {
             </Box>
           </Button>
 
-          <Button color="inherit" onClick={openModalHandler}>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <FaListAlt />
-              <Typography variant="caption">My Goals</Typography>
-            </Box>
+          {/* My Goals */}
+          <Button
+            onClick={openModalHandler}
+            size="large"
+            sx={{
+              color: "#4a9c8c",
+              "&:hover": {
+                backgroundColor: "#6bb5a220",
+              },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <FaListAlt />
+            <Typography variant="caption">My Goals</Typography>
           </Button>
 
-          <Button color="inherit" onClick={openOptionsModalHandler}>
+          {/* Options */}
+          <Button
+            onClick={openOptionsModalHandler}
+            size="large"
+            sx={{
+              color: "#4a9c8c",
+              "&:hover": {
+                backgroundColor: "#6bb5a220",
+              },
+            }}
+          >
             <Box
               sx={{
                 display: "flex",

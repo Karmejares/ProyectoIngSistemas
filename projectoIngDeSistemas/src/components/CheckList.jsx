@@ -75,7 +75,7 @@ function CheckList() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       console.log("Response from server:", response.data);
@@ -97,10 +97,21 @@ function CheckList() {
 
   // ✅ Close Modal
   return (
-    <Box sx={{ padding: 2 }}>
+    <>
       <Grid container spacing={2} alignItems="center">
         <Grid item>
-          <Button variant="contained" onClick={handleOpenModal}>
+          <Button
+            variant="contained"
+            onClick={handleOpenModal}
+            sx={{
+              backgroundColor: "#6bb5a2",
+              color: "#ffffff",
+              "&:hover": {
+                backgroundColor: "#5da894",
+              },
+              textTransform: "none",
+            }}
+          >
             ➕ Add New Goal
           </Button>
         </Grid>
@@ -117,11 +128,12 @@ function CheckList() {
             calculateStreak={calculateStreak}
           />
         ) : (
-          <Typography variant="h6" color="textSecondary">
+          <Typography variant="h6" sx={{ color: "#4a9c8c" }}>
             No goals found. Try adding a new goal!
           </Typography>
         )}
       </Box>
+
       {error && (
         <Alert severity="error" sx={{ mt: 2 }}>
           {error}
@@ -137,7 +149,7 @@ function CheckList() {
         }}
         loading={loading}
       />
-    </Box>
+    </>
   );
 }
 

@@ -48,7 +48,7 @@ function LogIn() {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        backgroundColor: "#f3f4f6",
+        backgroundColor: "#e6f1f5", // soft blue
         padding: 3,
       }}
     >
@@ -57,11 +57,19 @@ function LogIn() {
           width: 300,
           padding: 3,
           borderRadius: 2,
-          boxShadow: 3,
-          backgroundColor: "#fff",
+          boxShadow: 0,
+          backgroundColor: "#e6f1f5", // clean white card
         }}
       >
-        <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 2,
+            textAlign: "center",
+            color: "#4a9c8c", // calm muted green
+            fontWeight: 600,
+          }}
+        >
           Log In
         </Typography>
 
@@ -93,10 +101,15 @@ function LogIn() {
 
           <Button
             type="submit"
-            variant="contained"
-            color="primary"
             fullWidth
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              backgroundColor: "#6bb5a2", // muted green
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "#5aa492",
+              },
+            }}
           >
             Log In
           </Button>
@@ -112,7 +125,7 @@ function LogIn() {
           Don&#39;t have an account?{" "}
           <Link
             to="/SignUp"
-            style={{ textDecoration: "none", color: "#1976d2" }}
+            style={{ textDecoration: "none", color: "#4a9c8c" }} // deeper green
           >
             Sign Up
           </Link>

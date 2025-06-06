@@ -63,12 +63,17 @@ function SignUp() {
         maxWidth: 400,
         mx: "auto",
         mt: 4,
-        p: 2,
-        border: "1px solid #ccc",
+        p: 3,
         borderRadius: 2,
+        backgroundColor: "#e6f1f5",
       }}
     >
-      <Typography variant="h4" component="h1" gutterBottom>
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        sx={{ textAlign: "center", color: "#4a9c8c", fontWeight: 600 }}
+      >
         Sign Up
       </Typography>
 
@@ -147,6 +152,7 @@ function SignUp() {
         {errors.dob && (
           <FormHelperText error>{errors.dob.message}</FormHelperText>
         )}
+
         <TextField
           label="Password"
           type="password"
@@ -193,10 +199,15 @@ function SignUp() {
 
         <Button
           type="submit"
-          variant="contained"
-          color="primary"
           fullWidth
-          sx={{ mt: 2 }}
+          sx={{
+            mt: 2,
+            backgroundColor: "#6bb5a2",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#5aa492",
+            },
+          }}
         >
           Register
         </Button>
@@ -216,10 +227,17 @@ function SignUp() {
 
       <Button
         variant="outlined"
-        color="secondary"
         onClick={() => navigate("/")}
         fullWidth
-        sx={{ mt: 2 }}
+        sx={{
+          mt: 2,
+          color: "#6bb5a2",
+          borderColor: "#6bb5a2",
+          "&:hover": {
+            backgroundColor: "#e6f1f5",
+            borderColor: "#5aa492",
+          },
+        }}
       >
         Back to Log In
       </Button>

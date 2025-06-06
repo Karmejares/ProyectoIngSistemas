@@ -187,7 +187,7 @@ const GoalList = ({
                     flexDirection: "column",
                     alignItems: "flex-start",
                     borderBottom: "1px solid #eee",
-                    backgroundColor: "#f9f9f9",
+                    backgroundColor: "#ffffff",
                     borderRadius: "8px",
                     marginBottom: "8px",
                     padding: "10px",
@@ -205,7 +205,7 @@ const GoalList = ({
                       <Checkbox
                         checked={
                           goal.history?.includes(
-                            new Date().toISOString().slice(0, 10)
+                            new Date().toISOString().slice(0, 10),
                           ) ?? false
                         }
                         onChange={() => handleCheckboxChange(goal)}
@@ -216,7 +216,7 @@ const GoalList = ({
                         variant="body1"
                         sx={{
                           textDecoration: goal.history?.includes(
-                            new Date().toISOString().slice(0, 10)
+                            new Date().toISOString().slice(0, 10),
                           )
                             ? "line-through"
                             : "none",
@@ -229,18 +229,29 @@ const GoalList = ({
                     <Box sx={{ display: "flex", gap: 1 }}>
                       <Button
                         size="small"
-                        variant="outlined"
-                        color="primary"
                         onClick={() => handleOpenDetailsModal(goal)}
+                        sx={{
+                          backgroundColor: "#6bb5a2",
+                          color: "#ffffff",
+                          "&:hover": {
+                            backgroundColor: "#5da894",
+                          },
+                        }}
                       >
                         Details
                       </Button>
                       <Button
                         size="small"
-                        variant="outlined"
-                        color="primary"
                         onClick={() => toggleCalendarVisibility(goal._id)}
-                        sx={{ display: "flex", alignItems: "center" }}
+                        sx={{
+                          backgroundColor: "#6bb5a2",
+                          color: "#ffffff",
+                          display: "flex",
+                          alignItems: "center",
+                          "&:hover": {
+                            backgroundColor: "#5da894",
+                          },
+                        }}
                       >
                         <FaListAlt style={{ marginRight: 4 }} /> History
                       </Button>
@@ -342,7 +353,7 @@ const GoalList = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
+            bgcolor: "#e6f1f5", // azul suave
             boxShadow: 24,
             p: 4,
             width: 400,
