@@ -16,6 +16,7 @@ import { removeGoal, updateStepDate } from "../redux/goalsSlice";
 import AddGoal from "./AddGoal";
 import { useSelector } from "react-redux";
 
+
 const GoalDetails = ({ goalId, onClose }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
@@ -23,11 +24,10 @@ const GoalDetails = ({ goalId, onClose }) => {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [optimisticSteps, setOptimisticSteps] = useState({});
 
-  // Obtiene la lista de objetivos desde el store
-  const goals = useSelector((state) => state.goals.items); // o como tengas el selector
+  const goals = useSelector((state) => state.goals.items);
   console.log("Goals from Redux:", goals);
   console.log("Goal ID:", goalId);
-  // Busca el goal actualizado por id
+
   const goal = goals.find((g) => g._id === goalId);
 
   if (!goal) return null;

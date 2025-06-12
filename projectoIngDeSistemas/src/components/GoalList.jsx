@@ -22,30 +22,28 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import DayRenderer from "./DayRenderer";
 import { useDispatch, useSelector } from "react-redux";
-import { updateGoal, removeGoal, fetchGoals } from "../redux/goalsSlice";
+import { updateGoal, fetchGoals } from "../redux/goalsSlice";
 import {
   addTenCoins,
   removeTenCoins,
   updateCoinsOnServer,
 } from "../redux/coinsSlice";
 import axios from "axios";
-import Modal from "@mui/material/Modal"; // Import Modal from Material UI
+import Modal from "@mui/material/Modal";
+import useModalManager from "../Hooks/useModalManager"
 
 import GoalDetails from "./GoalDetails"; // Import the new GoalDetails component
 const GoalList = ({
-  AddGoal, // Add AddGoal as a prop
-  deleteMode,
+  AddGoal,
   handleToggleGoal,
   toggleCalendarVisibility,
   visibleCalendars,
-  calculateStreak,
-  handleCalendarDayClick,
-  handleToggleCalendarVisibility,
+  calculateStreak
 }) => {
+  const { open, close, activeModal, modalProps } = useModalManager();
   const [selectedGoal, setSelectedGoal] = useState(null); // Used for delete modal
   const [openDeleteModal, setOpenDeleteModal] = useState(false); // State for delete modal
   const [showSnackbar, setShowSnackbar] = useState(false);
-  const [openDetailsModal, setOpenDetailsModal] = useState(false); // State for details modal
   const [openEditModal, setOpenEditModal] = useState(false); // State for edit modal
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
@@ -54,23 +52,6 @@ const GoalList = ({
   const coins = useSelector((state) => state.coins.amount);
   const goals = useSelector((state) => state.goals?.items || []);
 
-  // ✅ Close Delete Modal
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-    setSelectedGoal(null);
-  };
-
-  // ✅ Close Details Modal
-  const handleCloseDetailsModal = () => {
-    setOpenDetailsModal(false);
-    setSelectedGoal(null);
-  };
-
-  // ✅ Close Edit Modal
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false);
-    setSelectedGoal(null);
-  };
 
   // ✅ Handle Checkbox change (Add or Remove 10 Coins using Redux)
   const handleCheckboxChange = (goal) => {
@@ -107,37 +88,6 @@ const GoalList = ({
     setShowSnackbar(false);
   };
 
-  // ✅ Handle Delete Goal
-  const handleDeleteGoal = async (goalId) => {
-    const token = localStorage.getItem("token");
-
-    try {
-      //console.log(`Attempting to delete goal: ${goalId}`);
-
-      // Send delete request to the backend
-      await axios.delete(`http://localhost:3001/api/goals/${goalId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      //console.log("🗑️ Goal deleted successfully!");
-
-      // ✅ Refetch the goals from the backend
-      dispatch(fetchGoals());
-
-      setSnackbarMessage("🗑️ Goal Removed!");
-      setAlertSeverity("info");
-      setShowSnackbar(true);
-    } catch (error) {
-      console.error("❌ Error removing goal:", error.message);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-      }
-    }
-  };
-
   // ✅ Fetch goals when component mounts
   useEffect(() => {
     dispatch(fetchGoals()).then((response) => {
@@ -145,27 +95,12 @@ const GoalList = ({
     });
   }, [dispatch]);
 
-  // ✅ Handle Update Goal (called from AddGoal in edit mode)
-  const handleUpdateGoal = async (updatedGoalData) => {
-    try {
-      await dispatch(updateGoal(updatedGoalData)).unwrap();
-      console.log("🎉 Goal updated successfully!");
-      handleCloseEditModal(); // Close the edit modal on successful update
-    } catch (error) {
-      console.error("❌ Error updating goal:", error.message);
-    }
-  };
+
 
   // ✅ Handle Edit Goal (called from GoalDetails)
   const handleEditGoal = (goal) => {
     setSelectedGoal(goal); // Set the goal to be edited
     setOpenEditModal(true); // Open the edit modal
-  };
-
-  // ✅ Open Details Modal
-  const handleOpenDetailsModal = (goal) => {
-    setSelectedGoal(goal);
-    setOpenDetailsModal(true);
   };
 
   return (
@@ -229,7 +164,7 @@ const GoalList = ({
                     <Box sx={{ display: "flex", gap: 1 }}>
                       <Button
                         size="small"
-                        onClick={() => handleOpenDetailsModal(goal)}
+                        onClick={() => open('detailsModal', {goal} )}
                         sx={{
                           backgroundColor: "#6bb5a2",
                           color: "#ffffff",
@@ -314,36 +249,9 @@ const GoalList = ({
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
-      {/* Delete Confirmation Modal */}
-      <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this goal? This action cannot be
-            undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteModal} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {
-              handleDeleteGoal(selectedGoal._id);
-              handleCloseDeleteModal();
-            }}
-            color="error"
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Goal Details Modal */}
       <Modal
-        open={openDetailsModal}
-        onClose={handleCloseDetailsModal}
+        open={activeModal === 'detailsModal'}
+        onClose={close}
         aria-labelledby="goal-details-modal-title"
         aria-describedby="goal-details-modal-description"
       >
@@ -359,44 +267,12 @@ const GoalList = ({
             width: 400,
           }}
         >
-          {/* {console.log("Selected Goal for Details:", selectedGoal)} */}
-          {console.log("Selected Goal ID:", selectedGoal?._id)}
-          {selectedGoal && (
+          {/*{console.log("Selected Goal ID:", selectedGoal?._id)}*/}
+          {modalProps?.goal && (
             <GoalDetails
-              goalId={selectedGoal._id}
-              onClose={handleCloseDetailsModal}
+              goalId={modalProps.goal._id}
+              onClose={close}
               onEdit={handleEditGoal}
-            />
-          )}
-        </Box>
-      </Modal>
-
-      {/* Edit Goal Modal */}
-      <Modal
-        open={openEditModal}
-        onClose={handleCloseEditModal}
-        aria-labelledby="edit-goal-modal-title"
-        aria-describedby="edit-goal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            width: 400,
-          }}
-        >
-          {/* Render AddGoal component in edit mode */}
-          {selectedGoal && AddGoal && (
-            <AddGoal
-              goalToEdit={selectedGoal._id}
-              isEditing={true}
-              onClose={handleCloseEditModal}
-              onUpdate={handleUpdateGoal}
             />
           )}
         </Box>
