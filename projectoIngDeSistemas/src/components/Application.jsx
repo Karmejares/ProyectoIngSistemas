@@ -1,29 +1,26 @@
 import React, { useEffect, useState } from "react";
 import {
   Typography,
-  List,
-  ListItem,
   Button,
   Box,
   Snackbar,
   Alert,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCoins, updateCoinsOnServer } from "../redux/coinsSlice";
+import { fetchCoins } from "../redux/coinsSlice";
 import {
   fetchInventory,
-  removeFoodFromBackend,
 } from "../redux/foodInventorySlice";
-import { fetchHungerLevel, feedPet } from "../redux/petStatusSlice";
+import { fetchHungerLevel } from "../redux/petStatusSlice";
 import PetCard from "./PetCard";
 import { motion } from "framer-motion";
 import { LinearProgress } from "@mui/material";
 import { useContext } from "react";
 import { TimerContext } from "./TimerContext";
-import { Card, CardContent, CardMedia, Chip, Divider } from "@mui/material";
+import { Card, CardContent, Chip, Divider } from "@mui/material";
 import { Grid } from "@mui/material";
 import MainFooter from "./MainFooter";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import FoodButton from "../atoms/foodButton.jsx";
 
 // Match food names to icons
 const foodIcons = {
@@ -93,46 +90,16 @@ function Application() {
     }
   }, [token, dispatch]);
 
-  // ✅ Handle Pet Animation when fed
-  useEffect(() => {
-    if (lastFed) {
-      setIsBouncing(true);
-      setSnackbar(true);
-      setTimeout(() => {
-        setIsBouncing(false);
-        setSnackbar(false);
-      }, 1000);
-    }
-  }, [lastFed]);
+  const triggerFeedAnimation = () => {
+    setIsBouncing(true);
+    setSnackbar(true);
+    setTimeout(() => {
+      setIsBouncing(false);
+      setSnackbar(false);
+    }, 1000);
+  };
 
   // ✅ Handle Click to Feed Pet
-
-  const handleFeedClick = async (food) => {
-    try {
-      // 🔄 Remove food from backend and refresh inventory
-      await dispatch(removeFoodFromBackend({ foodItem: food }));
-
-      // 🔄 Fetch the updated inventory
-      await dispatch(fetchInventory());
-
-      // 🔄 Feed the pet
-      await dispatch(feedPet());
-
-      // 🔄 Fetch the updated hunger level
-      await dispatch(fetchHungerLevel());
-
-      // 🔄 Animations & Snackbars
-      setIsBouncing(true);
-      setSnackbar(true);
-
-      setTimeout(() => {
-        setIsBouncing(false);
-        setSnackbar(false);
-      }, 1000);
-    } catch (error) {
-      console.error("❌ Error feeding the pet:", error.message);
-    }
-  };
 
   // ✅ Trigger Alert when Time Runs Out
   useEffect(() => {
@@ -211,44 +178,20 @@ function Application() {
               </Typography>
             </CardContent>
             <Divider />
-            <Box sx={{ display: "flex", gap: 1, padding: 2, flexWrap: "wrap" }}>
-              {console.log(foodInventory)}
+            <Box sx={{ display: "flex", gap: 1, p: 2, flexWrap: "wrap" }}>
               {foodInventory.length > 0 ? (
-                foodInventory.map((food, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => handleFeedClick(food)}
-                    sx={{
-                      backgroundColor: "#F06292", // Candy pink
-                      color: "#fff",
-                      "&:hover": {
-                        backgroundColor: "#ec407a",
-                      },
-                      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
-                      borderRadius: "16px",
-                      padding: "8px",
-                      minWidth: 80,
-                      minHeight: 100,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 0.5,
-                      textTransform: "none", // keeps the text like "Cookies" instead of "COOKIES"
-                    }}
-                  >
-                    <DotLottieReact
-                      src={foodIcons[food]}
-                      autoplay
-                      loop
-                      style={{ width: 50, height: 50 }}
-                    />
-                    {food}
-                  </Button>
-                ))
+                  foodInventory.map((food, index) => (
+                      <FoodButton
+                          key={index}
+                          food={food}
+                          icon={foodIcons[food]}
+                          onFed={triggerFeedAnimation}
+                      />
+                  ))
               ) : (
-                <Typography sx={{ mt: 1 }} color="textSecondary">
-                  No food available. Visit the store!
-                </Typography>
+                  <Typography sx={{ mt: 1 }} color="textSecondary">
+                    No food available. Visit the store!
+                  </Typography>
               )}
             </Box>
           </Card>
@@ -264,7 +207,7 @@ function Application() {
               boxShadow: 3,
               border: "2px solid #d0e3e8",
               position: "relative", // for overlays if needed\
-              padding: 3,
+              padding: 3
             }}
           >
             <Card sx={cardStyles}>

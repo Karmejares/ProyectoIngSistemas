@@ -1,15 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   ListItem,
   Box,
   Checkbox,
   Typography,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Collapse,
   Snackbar,
   Alert,
@@ -22,27 +17,24 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import DayRenderer from "./DayRenderer";
 import { useDispatch, useSelector } from "react-redux";
-import { updateGoal, fetchGoals } from "../redux/goalsSlice";
+
 import {
   addTenCoins,
   removeTenCoins,
   updateCoinsOnServer,
 } from "../redux/coinsSlice";
-import axios from "axios";
 import Modal from "@mui/material/Modal";
 import useModalManager from "../Hooks/useModalManager"
 
 import GoalDetails from "./GoalDetails"; // Import the new GoalDetails component
 const GoalList = ({
-  AddGoal,
   handleToggleGoal,
   toggleCalendarVisibility,
   visibleCalendars,
   calculateStreak
 }) => {
   const { open, close, activeModal, modalProps } = useModalManager();
-  const [selectedGoal, setSelectedGoal] = useState(null); // Used for delete modal
-  const [openDeleteModal, setOpenDeleteModal] = useState(false); // State for delete modal
+  const [selectedGoal, setSelectedGoal] = useState(null); // Used for delete modal// State for delete modal
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false); // State for edit modal
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -53,28 +45,21 @@ const GoalList = ({
   const goals = useSelector((state) => state.goals?.items || []);
 
 
-  // ✅ Handle Checkbox change (Add or Remove 10 Coins using Redux)
   const handleCheckboxChange = (goal) => {
-    //console.log("Goal object received:", goal); // Check the full object
     console.log("Goal ID:", goal._id); // Check if _id is actually present
     if (!handleToggleGoal) {
-      //console.error("❌ handleToggleGoal is not passed from parent!");
       return;
     }
-
-    // Trigger the toggle logic
     handleToggleGoal(goal._id);
 
     const today = new Date().toISOString().slice(0, 10);
 
     if (goal.history.includes(today)) {
-      // ✅ Unchecked => Remove 10 Coins
       dispatch(removeTenCoins());
       dispatch(updateCoinsOnServer({ amount: coins - 10, token }));
       setSnackbarMessage("💔 10 Coins Removed!");
       setAlertSeverity("error");
     } else {
-      // ✅ Checked => Add 10 Coins
       dispatch(addTenCoins());
       dispatch(updateCoinsOnServer({ amount: coins + 10, token }));
       setSnackbarMessage("🎉 10 Coins Added!");
@@ -88,16 +73,7 @@ const GoalList = ({
     setShowSnackbar(false);
   };
 
-  // ✅ Fetch goals when component mounts
-  useEffect(() => {
-    dispatch(fetchGoals()).then((response) => {
-      //console.log("Goals fetched from Redux state:", response.payload);
-    });
-  }, [dispatch]);
 
-
-
-  // ✅ Handle Edit Goal (called from GoalDetails)
   const handleEditGoal = (goal) => {
     setSelectedGoal(goal); // Set the goal to be edited
     setOpenEditModal(true); // Open the edit modal
