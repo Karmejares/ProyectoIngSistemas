@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { AppBar, Toolbar, Button, Typography, Box } from "@mui/material";
 import Modal from "./Modal";
 
@@ -6,11 +6,13 @@ import CheckList from "./CheckList";
 import OptionsMenu from "./OptionsMenu"; // Import the OptionsMenu component
 import Store from "./Store"; // Import the Store component
 import { FaStore, FaListAlt, FaCog } from "react-icons/fa"; // Import icons from react-icons
+import useGoals from "../Hooks/useGoals.jsx";
 
-function MainFooter({ goals, setGoals }) {
+function MainFooter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
+  const { goals, setGoals } = useGoals();
 
   const openModalHandler = () => {
     setIsModalOpen(true);
@@ -35,22 +37,6 @@ function MainFooter({ goals, setGoals }) {
   const closeStoreModalHandler = () => {
     setIsStoreModalOpen(false);
   };
-
-  useEffect(() => {
-    const fetchGoals = async () => {
-      try {
-        const response = await fetch("/api/goals");
-        if (!response.ok) {
-          throw new Error("Failed to fetch goals");
-        }
-        const data = await response.json();
-        setGoals(data); // Ensure `data` is an array of goals
-      } catch (error) {
-        console.error("Error fetching goals:", error);
-      }
-    };
-    fetchGoals();
-  }, []); // Empty dependency array means this effect runs only once after the initial render
 
   return (
     <>

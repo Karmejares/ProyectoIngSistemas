@@ -56,39 +56,15 @@ function Application() {
   useEffect(() => {
     if (token) {
       dispatch(fetchCoins(token));
-    }
-  }, [token, dispatch]);
-
-  // ✅ Load Pet Status from Local Storage
-
-  useEffect(() => {
-    if (token) {
       dispatch(fetchHungerLevel());
-    }
-  }, [token, dispatch]);
-
-  // ✅ Fetch goals from the backend
-  useEffect(() => {
-    const fetchGoals = async () => {
-      try {
-        const response = await fetch("http://localhost:3001/api/goals");
-        const data = await response.json();
-        setGoals(data.goals);
-      } catch (error) {
-        console.error("Error fetching goals:", error);
-      }
-    };
-
-    fetchGoals();
-  }, []);
-
-  // ✅ Fetch Inventory from the backend
-
-  useEffect(() => {
-    if (token) {
       dispatch(fetchInventory(token));
     }
   }, [token, dispatch]);
+
+
+  // ✅ Fetch goals from the backend
+
+
 
   const triggerFeedAnimation = () => {
     setIsBouncing(true);
@@ -99,9 +75,7 @@ function Application() {
     }, 1000);
   };
 
-  // ✅ Handle Click to Feed Pet
 
-  // ✅ Trigger Alert when Time Runs Out
   useEffect(() => {
     if (remainingTime === 0) {
       setOpenTimerSnackbar(true);
