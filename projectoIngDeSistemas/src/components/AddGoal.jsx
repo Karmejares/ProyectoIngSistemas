@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addGoal, updateGoal, fetchGoals } from "../redux/goalsSlice";
 import { useEffect } from "react";
 

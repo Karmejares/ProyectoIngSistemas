@@ -6,13 +6,11 @@ import CheckList from "./CheckList";
 import OptionsMenu from "./OptionsMenu"; // Import the OptionsMenu component
 import Store from "./Store"; // Import the Store component
 import { FaStore, FaListAlt, FaCog } from "react-icons/fa"; // Import icons from react-icons
-import useGoals from "../Hooks/useGoals.jsx";
 
 function MainFooter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
-  const { goals, setGoals } = useGoals();
 
   const openModalHandler = () => {
     setIsModalOpen(true);
@@ -57,7 +55,7 @@ function MainFooter() {
             <p style={{ fontSize: "16px" }}>
               Here you can define and track your goals!
             </p>
-            <CheckList goals={goals} setGoals={setGoals} />
+            <CheckList/>
           </Box>
         </Modal>
       )}
