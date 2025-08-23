@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { TimerContext } from "./TimerContext";
+import React from "react";
 import {
   Box,
   TextField,
@@ -11,98 +9,18 @@ import {
   Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import { useTimerControl } from "./useTimerControl";
 
 const TimerControl = ({ username }) => {
-  const [timeLimit, setTimeLimit] = useState(0); // Minutes
-  const [timeExceeded, setTimeExceeded] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const { remainingTime, setRemainingTime, formatTime } =
-    useContext(TimerContext);
-
-  // ✅ Fetch time limit from the server when the component mounts
-  useEffect(() => {
-    if (username) {
-      axios
-        .get(`http://localhost:3001/api/options/${username}`)
-        .then((response) => {
-          if (response.data && response.data.timeLimit) {
-            setTimeLimit(response.data.timeLimit);
-            const savedTime = localStorage.getItem("remainingTime");
-            if (savedTime) {
-              setRemainingTime(parseInt(savedTime));
-            } else {
-              const milliseconds = response.data.timeLimit * 60 * 1000;
-              setRemainingTime(milliseconds);
-            }
-          }
-        })
-        .catch((error) => console.error("Error fetching time limit:", error));
-    }
-  }, [username]);
-
-  // ✅ Save the timer in localStorage to persist state on modal close
-  useEffect(() => {
-    if (remainingTime !== null) {
-      localStorage.setItem("remainingTime", remainingTime);
-    }
-  }, [remainingTime]);
-
-  // ✅ Countdown Timer Logic
-  useEffect(() => {
-    if (remainingTime !== null && remainingTime > 0) {
-      const countdownInterval = setInterval(() => {
-        setRemainingTime((prev) => {
-          if (prev <= 1000) {
-            clearInterval(countdownInterval);
-            localStorage.removeItem("remainingTime");
-            setTimeExceeded(true);
-            setOpenSnackbar(true); // ✅ Show Snackbar
-            return 0;
-          }
-          return prev - 1000;
-        });
-      }, 1000);
-
-      return () => clearInterval(countdownInterval); // ✅ Cleanup properly
-    }
-  }, []); // ✅ Empty dependency array, runs once
-
-  // ✅ Handle Timer Setting
-  const handleSetTimeLimit = (e) => {
-    const minutes = parseInt(e.target.value) || 0;
-    setTimeLimit(minutes);
-
-    // 🔄 Convert to milliseconds and update both local and global state
-    const milliseconds = minutes * 60 * 1000;
-    setRemainingTime(milliseconds);
-
-    if (username) {
-      axios
-        .put(`http://localhost:3001/api/options/${username}`, {
-          timeLimit: minutes,
-        })
-        .then((response) => {
-          console.log("✅ Time limit updated in the database:", response.data);
-        })
-        .catch((error) => {
-          console.error("❌ Error updating time limit:", error.message);
-        });
-    } else {
-      console.error("❌ Username not found in context.");
-    }
-  };
-
-  // ✅ Handle Snackbar Close
-  const handleCloseSnackbar = (_, reason) => {
-    if (reason === "clickaway") return;
-    setOpenSnackbar(false);
-  };
-
-  // ✅ Calculate percentage for progress
-  const percentage =
-    remainingTime !== null && timeLimit > 0
-      ? (remainingTime / (timeLimit * 60 * 1000)) * 100
-      : 0;
+  const {
+    timeLimit,
+    handleSetTimeLimit,
+    openSnackbar,
+    handleCloseSnackbar,
+    remainingTime,
+    formatTime,
+    percentage,
+  } = useTimerControl(username);
 
   return (
     <motion.div
@@ -113,23 +31,17 @@ const TimerControl = ({ username }) => {
       <Stack
         direction="column"
         spacing={2}
-        sx={{ alignItems: "center", justifyContent: "center", mt: 2 }}
+        sx={{ alignItems: "center", mt: 2 }}
       >
         <TextField
           label="Set Timer (Minutes)"
           type="number"
-          variant="outlined"
           value={timeLimit}
-          onChange={handleSetTimeLimit}
+          onChange={(e) => handleSetTimeLimit(e.target.value)}
           sx={{ width: "150px" }}
         />
 
-        <Box
-          sx={{
-            position: "relative",
-            display: "inline-flex",
-          }}
-        >
+        <Box sx={{ position: "relative", display: "inline-flex" }}>
           <CircularProgress
             variant="determinate"
             value={percentage}

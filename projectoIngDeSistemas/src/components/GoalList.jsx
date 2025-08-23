@@ -24,14 +24,14 @@ import {
   updateCoinsOnServer,
 } from "../redux/coinsSlice";
 import Modal from "@mui/material/Modal";
-import useModalManager from "../Hooks/useModalManager"
+import useModalManager from "../hooks/useModalManager";
 
 import GoalDetails from "./GoalDetails"; // Import the new GoalDetails component
 const GoalList = ({
   handleToggleGoal,
   toggleCalendarVisibility,
   visibleCalendars,
-  calculateStreak
+  calculateStreak,
 }) => {
   const { open, close, activeModal, modalProps } = useModalManager();
   const [selectedGoal, setSelectedGoal] = useState(null); // Used for delete modal// State for delete modal
@@ -43,7 +43,6 @@ const GoalList = ({
   const dispatch = useDispatch();
   const coins = useSelector((state) => state.coins.amount);
   const goals = useSelector((state) => state.goals?.items || []);
-
 
   const handleCheckboxChange = (goal) => {
     console.log("Goal ID:", goal._id); // Check if _id is actually present
@@ -72,7 +71,6 @@ const GoalList = ({
   const handleCloseSnackbar = () => {
     setShowSnackbar(false);
   };
-
 
   const handleEditGoal = (goal) => {
     setSelectedGoal(goal); // Set the goal to be edited
@@ -116,7 +114,7 @@ const GoalList = ({
                       <Checkbox
                         checked={
                           goal.history?.includes(
-                            new Date().toISOString().slice(0, 10),
+                            new Date().toISOString().slice(0, 10)
                           ) ?? false
                         }
                         onChange={() => handleCheckboxChange(goal)}
@@ -127,7 +125,7 @@ const GoalList = ({
                         variant="body1"
                         sx={{
                           textDecoration: goal.history?.includes(
-                            new Date().toISOString().slice(0, 10),
+                            new Date().toISOString().slice(0, 10)
                           )
                             ? "line-through"
                             : "none",
@@ -140,7 +138,7 @@ const GoalList = ({
                     <Box sx={{ display: "flex", gap: 1 }}>
                       <Button
                         size="small"
-                        onClick={() => open('detailsModal', {goal} )}
+                        onClick={() => open("detailsModal", { goal })}
                         sx={{
                           backgroundColor: "#6bb5a2",
                           color: "#ffffff",
@@ -226,7 +224,7 @@ const GoalList = ({
         </Alert>
       </Snackbar>
       <Modal
-        open={activeModal === 'detailsModal'}
+        open={activeModal === "detailsModal"}
         onClose={close}
         aria-labelledby="goal-details-modal-title"
         aria-describedby="goal-details-modal-description"
