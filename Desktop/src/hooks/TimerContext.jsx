@@ -1,5 +1,4 @@
-// TimerContext.js
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const TimerContext = createContext();
 
@@ -15,14 +14,12 @@ export const TimerProvider = ({ children }) => {
     }
   }, []);
 
-  // ✅ Save time to localStorage on change
   useEffect(() => {
     if (remainingTime !== null) {
       localStorage.setItem("remainingTime", remainingTime);
     }
   }, [remainingTime]);
 
-  // ✅ Timer logic
   useEffect(() => {
     if (remainingTime !== null && remainingTime > 0) {
       const interval = setInterval(() => {
@@ -41,7 +38,6 @@ export const TimerProvider = ({ children }) => {
     }
   }, [remainingTime]);
 
-  // ✅ Format time
   const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const hours = Math.floor(totalSeconds / 3600);

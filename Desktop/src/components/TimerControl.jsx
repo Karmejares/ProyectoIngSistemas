@@ -9,7 +9,7 @@ import {
   Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { useTimerControl } from "./useTimerControl";
+import { useTimerControl } from "../hooks/useTimerControl";
 
 const TimerControl = ({ username }) => {
   const {

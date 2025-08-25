@@ -1,7 +1,7 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "./UserContext";
+import { useUser } from "../hooks/useUser";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
 
 function LogIn() {
@@ -9,10 +9,9 @@ function LogIn() {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm();
   const [error, setError] = useState("");
-  const { logInUser } = useContext(UserContext);
+  const { logInUser } = useUser();
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {

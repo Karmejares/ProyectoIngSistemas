@@ -55,17 +55,14 @@ function MainFooter() {
             <p style={{ fontSize: "16px" }}>
               Here you can define and track your goals!
             </p>
-            <CheckList/>
+            <CheckList />
           </Box>
         </Modal>
       )}
-      {isOptionsModalOpen && (
-        <Modal onClose={closeOptionsModalHandler}>
-          <Box sx={{ marginRight: 2.5 }}>
-            <OptionsMenu />
-          </Box>
-        </Modal>
-      )}
+      <OptionsMenu
+        open={isOptionsModalOpen}
+        onClose={closeOptionsModalHandler}
+      />
       {isStoreModalOpen && (
         <Modal onClose={closeStoreModalHandler}>
           <Box sx={{ marginRight: 2.5 }}>
@@ -129,8 +126,6 @@ function MainFooter() {
             <FaListAlt />
             <Typography variant="caption">My Goals</Typography>
           </Button>
-
-          {/* Options */}
           <Button
             onClick={openOptionsModalHandler}
             size="large"
