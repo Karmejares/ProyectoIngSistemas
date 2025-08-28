@@ -14,6 +14,7 @@
     "framer-motion": "^12.10.5",
     "glob": "^11.0.3",
     "mongoose": "^8.14.3",
+    "react-hook-form": "^7.62.0",
     "react-icons": "^5.5.0",
     "react-native-web": "^0.21.0"
   },

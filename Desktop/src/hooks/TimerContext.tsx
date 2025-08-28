@@ -1,12 +1,10 @@
 import { createContext, useState, useEffect } from "react";
 
-export const TimerContext = createContext();
+export const TimerContext = createContext(0);
 
 export const TimerProvider = ({ children }) => {
   const [remainingTime, setRemainingTime] = useState(null);
-  const [countdown, setCountdown] = useState(null);
-
-  // ✅ Load initial time from localStorage
+  const [countdown, setCountdown] = useState(0);
   useEffect(() => {
     const savedTime = localStorage.getItem("remainingTime");
     if (savedTime) {

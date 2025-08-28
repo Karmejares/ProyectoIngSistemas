@@ -1,8 +1,7 @@
-import { useState } from "react";
+import TimerControl from "./TimerControl";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
-import axios from "axios";
-import TimerControl from "./TimerControl";
+import { useOptionsMenu } from "../hooks/useOptionsMenu";
 
 import {
   Drawer,
@@ -22,72 +21,21 @@ function OptionsMenu({ open, onClose }) {
   const navigate = useNavigate();
   const { logOutUser, username, token } = useUser();
 
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSuccess, setPasswordSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleLogout = () => {
-    alert("You are now logged out!");
-    logOutUser();
-    navigate("/");
-  };
-
-  const handleDeleteAccount = () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This action cannot be undone."
-    );
-    if (confirmDelete) {
-      axios
-        .delete(`http://localhost:3001/api/options/${username}`)
-        .then(() => {
-          alert("Your account has been deleted.");
-          logOutUser();
-          navigate("/");
-        })
-        .catch((error) => console.error("Error deleting account:", error));
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword) {
-      setPasswordError("All fields are required.");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setPasswordError("Password must be at least 6 characters long.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        "http://localhost:3001/api/auth/changePassword",
-        { currentPassword, newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.status === 200) {
-        setPasswordSuccess("Password updated successfully!");
-        setTimeout(() => handleClosePasswordModal(), 1500);
-      }
-    } catch (error) {
-      console.error("❌ Error updating password:", error.message);
-      setPasswordError("Failed to update password. Check your credentials.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClosePasswordModal = () => {
-    setShowPasswordModal(false);
-    setCurrentPassword("");
-    setNewPassword("");
-    setPasswordError("");
-    setPasswordSuccess("");
-  };
+  const {
+    showPasswordModal,
+    currentPassword,
+    newPassword,
+    passwordError,
+    passwordSuccess,
+    loading,
+    setShowPasswordModal,
+    setCurrentPassword,
+    setNewPassword,
+    handleLogout,
+    handleDeleteAccount,
+    handleChangePassword,
+    handleClosePasswordModal,
+  } = useOptionsMenu({ logOutUser, username, token, navigate });
 
   return (
     <>
@@ -203,7 +151,6 @@ function OptionsMenu({ open, onClose }) {
         </Box>
       </Drawer>
 
-      {/* Modal - Cambiar contraseña */}
       <Modal open={showPasswordModal} onClose={handleClosePasswordModal}>
         <Box
           sx={{

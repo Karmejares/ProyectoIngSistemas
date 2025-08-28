@@ -1,6 +1,3 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -8,54 +5,19 @@ import {
   Box,
   FormHelperText,
 } from "@mui/material";
+import { useSignUpForm } from "../hooks/useSignUpForm";
 
 function SignUp() {
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
-  const [serverError, setServerError] = useState("");
-  const [success, setSuccess] = useState("");
-  const navigate = useNavigate();
-
-  const password = watch("password");
-
-  const onSubmit = async (data) => {
-    setServerError("");
-    setSuccess("");
-
-    try {
-      const response = await fetch(
-        "http://localhost:3001/api/usuarios/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: data.username,
-            password: data.password,
-            email: data.email,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || "Signup failed");
-      }
-
-      setSuccess("Registration successful! Redirecting to login...");
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
-    } catch (err) {
-      console.error("Error during signup:", err.message);
-      setServerError(err.message);
-    }
-  };
+    onSubmit,
+    errors,
+    password,
+    serverError,
+    success,
+    navigate,
+  } = useSignUpForm();
 
   return (
     <Box

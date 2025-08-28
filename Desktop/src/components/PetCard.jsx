@@ -7,11 +7,7 @@ import VerySad from "../assets/VerySad.png";
 import Weak from "../assets/Weak.png";
 
 const PetCard = () => {
-  // ✅ Get the status from Redux
   const { status } = useSelector((state) => state.petStatus);
-  //const status = "very sad"; // For testing purposes, replace with actual Redux state
-
-  // ✅ Map status to the corresponding image
   const petImage = {
     happy: Happy,
     neutral: Neutral,
