@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3001/api/auth";
+  import.meta.env && import.meta.env.MODE === "development"
+    ? "http://localhost:3001/api/auth"
+    : "https://proyectoingsistemas-3.onrender.com/api/auth";
 
 export const userService = {
   getProfile: (token) =>
