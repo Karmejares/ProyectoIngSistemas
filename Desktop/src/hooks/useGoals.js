@@ -11,7 +11,7 @@ export default function useGoals() {
   const [localError, setLocalError] = useState(null);
 
   const API_URL =
-    import.meta.env && import.meta.env.MODE === "development"
+    import.meta.env && import.meta.env.MODE === "production"
       ? "http://localhost:3001/api/goals"
       : "https://proyectoingsistemas-3.onrender.com/api/goals";
 
