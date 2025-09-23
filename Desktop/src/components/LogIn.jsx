@@ -1,8 +1,13 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
+
+const API_URL =
+  import.meta.env && import.meta.env.MODE === "development"
+    ? "http://localhost:3001/api/auth"
+    : "https://proyectoingsistemas-3.onrender.com/api/auth";
 
 function LogIn() {
   const {
@@ -18,7 +23,7 @@ function LogIn() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3001/api/auth/login", {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
