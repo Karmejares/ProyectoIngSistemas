@@ -14,7 +14,6 @@ import { Grid } from "@mui/material";
 import MainFooter from "./MainFooter";
 import FoodButton from "../atoms/foodButton.jsx";
 
-// Match food names to icons
 const foodIcons = {
   Fish: "https://lottie.host/72ec3a40-8764-4c81-b46e-6394535763e4/Z6BlFXoYGI.lottie",
   Cookies:
@@ -40,7 +39,6 @@ function Application() {
     (state) => state.petStatus
   );
 
-  // ✅ Redux state and dispatch
   const dispatch = useDispatch();
   const coins = useSelector((state) => state.coins.amount);
   const token = localStorage.getItem("token");
@@ -93,16 +91,11 @@ function Application() {
 
   return (
     <>
-      <Grid
-        sx={{
-          marginTop: 22,
-        }}
-      ></Grid>
       <Box
         display="flex"
         flexDirection="column"
         alignItems="center"
-        sx={{ minHeight: "100vh", padding: 3 }}
+        sx={{ position: "absolute", height: "100%", width: "100%", padding: 3 }}
       >
         {/* Coins in top-right corner */}
         <Chip
