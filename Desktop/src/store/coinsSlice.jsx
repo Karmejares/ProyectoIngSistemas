@@ -5,7 +5,7 @@ console.log("import.meta.env.MODE:", import.meta.env.MODE);
 console.log("import.meta.env:", import.meta.env);
 
 const API_URL =
-  import.meta.env && import.meta.env.MODE === "development"
+  import.meta.env && import.meta.env.MODE === "production"
     ? "http://localhost:3001/api/auth"
     : "https://proyectoingsistemas-3.onrender.com/api/auth";
 export const fetchCoins = createAsyncThunk(
