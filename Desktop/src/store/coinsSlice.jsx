@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-console.log("import.meta.env.MODE:", import.meta.env.MODE);
-console.log("import.meta.env:", import.meta.env);
-
 const API_URL =
   import.meta.env && import.meta.env.MODE === "production"
     ? "http://localhost:3001/api/auth"
@@ -19,6 +16,8 @@ export const fetchCoins = createAsyncThunk(
     return response.data.coins;
   }
 );
+
+console.log("API_URL:", API_URL);
 
 export const updateCoinsOnServer = createAsyncThunk(
   "coins/updateCoinsOnServer",
