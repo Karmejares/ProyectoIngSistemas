@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// ✅ Utility function to get the token
 const getToken = (getState) => {
   return getState().auth?.token || localStorage.getItem("token");
 };
@@ -30,7 +29,6 @@ export const fetchInventory = createAsyncThunk(
   }
 );
 
-// 🔄 Add food to backend
 export const addFoodToBackend = createAsyncThunk(
   "foodInventory/addFoodToBackend",
   async ({ foodItem }, { getState, rejectWithValue }) => {
@@ -56,7 +54,6 @@ export const addFoodToBackend = createAsyncThunk(
   }
 );
 
-// 🔄 Remove food from backend
 export const removeFoodFromBackend = createAsyncThunk(
   "foodInventory/removeFoodFromBackend",
   async ({ foodItem }, { getState, rejectWithValue }) => {

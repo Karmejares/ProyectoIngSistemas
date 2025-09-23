@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import { TimerProvider } from "./hooks/TimerContext";
 import { Provider } from "react-redux";
-import { store } from "./redux/store";
+import { store } from "./store/store";
 
 import LogIn from "./components/LogIn";
 import SignUp from "./components/SignUp";

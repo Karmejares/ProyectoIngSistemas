@@ -9,8 +9,8 @@ import {
   Alert,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { removeCoins, updateCoinsOnServer } from "../redux/coinsSlice";
-import { addFoodToBackend, fetchInventory } from "../redux/foodInventorySlice";
+import { removeCoins, updateCoinsOnServer } from "../store/coinsSlice";
+import { addFoodToBackend, fetchInventory } from "../store/foodInventorySlice";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 // Match food names to icons

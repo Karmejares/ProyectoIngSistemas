@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
-import { addGoal, updateGoal, fetchGoals } from "../redux/goalsSlice";
+import { addGoal, updateGoal, fetchGoals } from "../store/goalsSlice";
 
 export const useGoalForm = ({ goalToEdit, onClose }) => {
   const dispatch = useDispatch();

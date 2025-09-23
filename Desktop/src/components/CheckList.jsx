@@ -30,57 +30,56 @@ function CheckList() {
   };
 
   return (
-      <>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item>
-            <Button
-                variant="contained"
-                onClick={handleOpenModal}
-                sx={{
-                  backgroundColor: "#6bb5a2",
-                  color: "#ffffff",
-                  "&:hover": {
-                    backgroundColor: "#5da894",
-                  },
-                  textTransform: "none",
-                }}
-            >
-              ➕ Add New Goal
-            </Button>
-          </Grid>
-        </Grid>
-
-        <Box sx={{ mt: 2 }}>
-          {goals.length > 0 ? (
-              <GoalList
-                  handleToggleGoal={handleToggleGoal}
-                  handleDeleteGoal={handleDeleteGoal}
-                  toggleCalendarVisibility={toggleCalendarVisibility}
-                  visibleCalendars={visibleCalendars}
-                  calculateStreak={calculateStreak}
-              />
-          ) : (
-              <Typography variant="h6" sx={{ color: "#4a9c8c" }}>
-                No goals found. Try adding a new goal!
-              </Typography>
-          )}
-        </Box>
-
-        {error && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
-            </Alert>
-        )}
-
-        <AddGoal
-            open={openModal}
-            onClose={() => {
-              setOpenModal(false);
-              setEditGoal(null);
+    <>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <Button
+            variant="contained"
+            onClick={handleOpenModal}
+            sx={{
+              backgroundColor: "#6bb5a2",
+              color: "#ffffff",
+              "&:hover": {
+                backgroundColor: "#5da894",
+              },
+              textTransform: "none",
             }}
-            loading={loading}
-        />
-      </>
+          >
+            ➕ Add New Goal
+          </Button>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ mt: 2 }}>
+        {goals.length > 0 ? (
+          <GoalList
+            handleToggleGoal={handleToggleGoal}
+            toggleCalendarVisibility={toggleCalendarVisibility}
+            visibleCalendars={visibleCalendars}
+            calculateStreak={calculateStreak}
+          />
+        ) : (
+          <Typography variant="h6" sx={{ color: "#4a9c8c" }}>
+            No goals found. Try adding a new goal!
+          </Typography>
+        )}
+      </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      <AddGoal
+        open={openModal}
+        onClose={() => {
+          setOpenModal(false);
+          setEditGoal(null);
+        }}
+        loading={loading}
+      />
+    </>
   );
 }
 

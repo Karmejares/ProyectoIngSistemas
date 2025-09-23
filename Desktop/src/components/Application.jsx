@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Typography, Button, Box, Snackbar, Alert } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCoins } from "../redux/coinsSlice";
-import { fetchInventory } from "../redux/foodInventorySlice";
-import { fetchHungerLevel } from "../redux/petStatusSlice";
+import { fetchCoins } from "../store/coinsSlice";
+import { fetchInventory } from "../store/foodInventorySlice";
+import { fetchHungerLevel } from "../store/petStatusSlice";
 import PetCard from "./PetCard";
 import { motion } from "framer-motion";
 import { LinearProgress } from "@mui/material";

@@ -22,7 +22,7 @@ import {
   addTenCoins,
   removeTenCoins,
   updateCoinsOnServer,
-} from "../redux/coinsSlice";
+} from "../store/coinsSlice";
 import Modal from "@mui/material/Modal";
 import useModalManager from "../hooks/useModalManager";
 
@@ -45,7 +45,7 @@ const GoalList = ({
   const goals = useSelector((state) => state.goals?.items || []);
 
   const handleCheckboxChange = (goal) => {
-    console.log("Goal ID:", goal._id); // Check if _id is actually present
+    console.log("Goal ID:", goal._id);
     if (!handleToggleGoal) {
       return;
     }

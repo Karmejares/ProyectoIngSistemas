@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { removeGoal, updateStepDate } from "../redux/goalsSlice";
+import { removeGoal, updateStepDate } from "../store/goalsSlice";
 
 export const useGoalDetails = ({ goalId, onClose }) => {
   const dispatch = useDispatch();
