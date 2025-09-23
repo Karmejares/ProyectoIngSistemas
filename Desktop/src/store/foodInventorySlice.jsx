@@ -5,6 +5,11 @@ const getToken = (getState) => {
   return getState().auth?.token || localStorage.getItem("token");
 };
 
+const API_URL =
+  import.meta.env && import.meta.env.MODE === "development"
+    ? "http://localhost:3001/api/pet/inventory"
+    : "https://proyectoingsistemas-3.onrender.com/api/pet/inventory";
+
 // 🔄 Fetch inventory from backend
 export const fetchInventory = createAsyncThunk(
   "foodInventory/fetchInventory",
@@ -12,14 +17,11 @@ export const fetchInventory = createAsyncThunk(
     const token = getToken(getState);
     console.log("🔄 Fetching inventory with token:", token);
     try {
-      const response = await axios.get(
-        "http://localhost:3001/api/pet/inventory",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(API_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("✅ Inventory fetched:", response.data);
       return response.data;
     } catch (error) {
@@ -37,7 +39,7 @@ export const addFoodToBackend = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/pet/inventory/add",
+        `${API_URL}/add`,
         { foodItem },
         {
           headers: {
@@ -62,7 +64,7 @@ export const removeFoodFromBackend = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/pet/inventory/remove",
+        `${API_URL}/remove`,
         { foodItem },
         {
           headers: {

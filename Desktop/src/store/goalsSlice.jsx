@@ -4,13 +4,18 @@ import axios from "axios";
 const getToken = (getState) => {
   return getState().auth?.token || localStorage.getItem("token");
 };
-// 🔄 Fetch goals from backend
+
+const API_URL =
+  import.meta.env && import.meta.env.MODE === "development"
+    ? "http://localhost:3001/api/goals"
+    : "https://proyectoingsistemas-3.onrender.com/api/goals";
+
 export const fetchGoals = createAsyncThunk(
   "goals/fetchGoals",
   async (_, { rejectWithValue }) => {
     console.log("Fetching goals...");
     try {
-      const response = await axios.get("http://localhost:3001/api/goals", {
+      const response = await axios.get(API_URL, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -31,7 +36,7 @@ export const addGoal = createAsyncThunk(
     const token = getToken(getState);
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/goals",
+        API_URL,
         { title, description, plan },
         {
           headers: {
@@ -55,7 +60,7 @@ export const updateStepDate = createAsyncThunk(
     const token = getToken(getState);
     try {
       const response = await axios.patch(
-        `http://localhost:3001/api/goals/${goalId}/plan/step/${stepId}`,
+        `${API_URL}${goalId}/plan/step/${stepId}`,
         { date },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -74,14 +79,11 @@ export const removeGoal = createAsyncThunk(
   async (goalId, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     try {
-      const response = await axios.delete(
-        `http://localhost:3001/api/goals/${goalId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.delete(`${API_URL}${goalId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("✅ Goal removed from backend:", response.data);
       return goalId;
     } catch (error) {
@@ -98,7 +100,7 @@ export const updateGoal = createAsyncThunk(
     const token = getToken(getState);
     try {
       const response = await axios.put(
-        `http://localhost:3001/api/goals/${_id}`,
+        `${API_URL}${_id}`,
         { title, description, plan },
         {
           headers: {

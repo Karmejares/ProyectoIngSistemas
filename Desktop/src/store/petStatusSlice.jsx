@@ -7,14 +7,17 @@ const initialState = {
   foodInventory: [], // List of food items
 };
 
-// 🔄 Fetch hunger level and last fed time from the backend
+const API_URL =
+  import.meta.env && import.meta.env.MODE === "development"
+    ? "http://localhost:3001/api/pet"
+    : "https://proyectoingsistemas-3.onrender.com/api/pet";
 
 export const fetchHungerLevel = createAsyncThunk(
   "petStatus/fetchHungerLevel",
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3001/api/pet/hunger", {
+      const response = await axios.get(`${API_URL}/hunger`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -34,7 +37,7 @@ export const feedPet = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:3001/api/pet/feed",
+        `${API_URL}/feed`,
         {},
         {
           headers: {
@@ -62,12 +65,12 @@ const petStatusSlice = createSlice({
           action.payload.hungerLevel <= 20
             ? "happy"
             : action.payload.hungerLevel <= 40
-            ? "neutral"
-            : action.payload.hungerLevel <= 60
-            ? "sad"
-            : action.payload.hungerLevel <= 80
-            ? "very sad"
-            : "weak";
+              ? "neutral"
+              : action.payload.hungerLevel <= 60
+                ? "sad"
+                : action.payload.hungerLevel <= 80
+                  ? "very sad"
+                  : "weak";
       })
       .addCase(feedPet.fulfilled, (state) => {
         state.hungerLevel = 0;
