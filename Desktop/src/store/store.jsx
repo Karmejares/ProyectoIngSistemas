@@ -11,7 +11,7 @@ export const store = configureStore({
     coins: coinsReducer,
     foodInventory: foodInventoryReducer,
     petStatus: petStatusReducer,
-    goals: goalsReducer, // ✅ Add the goals reducer
+    goals: goalsReducer,
   },
-  devTools: isDevelopment, // ✅ Enable DevTools only in development mode
+  devTools: isDevelopment,
 });

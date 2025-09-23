@@ -5,7 +5,6 @@ const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
 const mongoose = require("mongoose");
 
-// ✅ Get all goals for the logged-in user
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -21,7 +20,6 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Add a new goal
 router.post("/", authMiddleware, async (req, res) => {
   const { title, description, plan } = req.body;
 
@@ -31,14 +29,13 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ⚠️ Aseguramos que cada paso tenga un _id si usas StepSchema con _id (opcional)
     const formattedPlan = plan.map((step) => ({
       ...step,
       _id: new mongoose.Types.ObjectId(),
     }));
 
     const newGoal = {
-      _id: new mongoose.Types.ObjectId(), // ✅ Generamos ID explícitamente
+      _id: new mongoose.Types.ObjectId(),
       title,
       description,
       plan: formattedPlan,
@@ -49,7 +46,6 @@ router.post("/", authMiddleware, async (req, res) => {
     user.goals.push(newGoal);
     await user.save();
 
-    // Buscamos el último goal guardado para retornarlo ya con el ID asignado
     const savedGoal = user.goals[user.goals.length - 1];
 
     res.json(savedGoal);
@@ -58,8 +54,6 @@ router.post("/", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
-// ✅ Add the date to a step of a goal
 
 router.patch("/:goalId/plan/step/:stepId", authMiddleware, async (req, res) => {
   const { goalId, stepId } = req.params;
@@ -85,7 +79,6 @@ router.patch("/:goalId/plan/step/:stepId", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Toggle goal history
 router.put("/:id/toggle", authMiddleware, async (req, res) => {
   //console.log("🔄 Toggling goal status...");
 
@@ -96,19 +89,13 @@ router.put("/:id/toggle", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    //console.log("✅ User found:", user.username);
-
     const goal = user.goals.id(req.params.id);
-    //console.log(`🔍 Looking for goal with ID: ${req.params.id}`);
-    //console.log("Goal found:", goal);
 
     if (!goal) {
-      //console.log(`⚠️ Goal with ID ${req.params.id} not found for user.`);
       return res.status(404).json({ message: "Goal not found" });
     }
 
     const date = req.body.date;
-    //console.log("📅 Date to toggle:", date);
 
     if (goal.history.includes(date)) {
       goal.history = goal.history.filter((d) => d !== date);
@@ -117,15 +104,12 @@ router.put("/:id/toggle", authMiddleware, async (req, res) => {
     }
 
     await user.save();
-    //console.log("✅ Goal toggled successfully!");
     res.json(goal);
   } catch (error) {
-    //console.error("❌ Error toggling goal status:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
-// ✅ Update an existing goal
 router.put("/:id", authMiddleware, async (req, res) => {
   const { title, description, plan } = req.body;
 
@@ -144,19 +128,18 @@ router.put("/:id", authMiddleware, async (req, res) => {
     goal.title = title;
     goal.description = description;
     goal.plan = (plan || []).map((step) => ({
-      stepDescription: step.stepDescription || step, // si viene objeto, toma la propiedad; si string, la usa directamente
+      stepDescription: step.stepDescription || step,
       date: step.date || null,
     }));
 
     await user.save();
-    res.json(goal); // return the updated goal
+    res.json(goal);
   } catch (error) {
     console.error("❌ Error updating goal:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
-// ✅ Remove a goal
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -171,7 +154,6 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     await user.save();
     res.json(user.goals);
   } catch (error) {
-    //console.error("❌ Error removing goal:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });
