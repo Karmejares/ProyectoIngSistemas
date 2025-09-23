@@ -2,6 +2,11 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { TimerContext } from "./TimerContext";
 
+const OPTIONS_URL =
+  import.meta.env && import.meta.env.MODE === "development"
+    ? "http://localhost:3001/api/options"
+    : "https://proyectoingsistemas-3.onrender.com/api/options";
+
 export const useTimerControl = (username) => {
   const [timeLimit, setTimeLimit] = useState(0); // en minutos
   const [timeExceeded, setTimeExceeded] = useState(false);
@@ -13,7 +18,7 @@ export const useTimerControl = (username) => {
   useEffect(() => {
     if (username) {
       axios
-        .get(`http://localhost:3001/api/options/${username}`)
+        .get(`${OPTIONS_URL}/${username}`)
         .then((response) => {
           if (response.data?.timeLimit) {
             setTimeLimit(response.data.timeLimit);
@@ -68,7 +73,7 @@ export const useTimerControl = (username) => {
 
     if (username) {
       axios
-        .put(`http://localhost:3001/api/options/${username}`, {
+        .put(`${OPTIONS_URL}/${username}`, {
           timeLimit: value,
         })
         .then((res) => console.log("✅ Time updated:", res.data))

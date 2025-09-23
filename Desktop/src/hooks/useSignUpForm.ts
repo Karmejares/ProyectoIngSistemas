@@ -15,25 +15,27 @@ export function useSignUpForm() {
 
   const password = watch("password");
 
+  const API_URL =
+    import.meta.env && import.meta.env.MODE === "development"
+      ? "http://localhost:3001/api/usuarios"
+      : "https://proyectoingsistemas-3.onrender.com/api/usuarios";
+
   const onSubmit = async (data: any) => {
     setServerError("");
     setSuccess("");
 
     try {
-      const response = await fetch(
-        "http://localhost:3001/api/usuarios/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: data.username,
-            password: data.password,
-            email: data.email,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+          email: data.email,
+        }),
+      });
 
       if (!response.ok) {
         const err = await response.json();

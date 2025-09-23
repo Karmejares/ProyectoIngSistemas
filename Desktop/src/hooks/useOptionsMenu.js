@@ -9,6 +9,16 @@ export function useOptionsMenu({ logOutUser, username, token, navigate }) {
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const API_URL =
+    import.meta.env && import.meta.env.MODE === "development"
+      ? "http://localhost:3001/api/auth"
+      : "https://proyectoingsistemas-3.onrender.com/api/auth";
+
+  const OPTIONS_URL =
+    import.meta.env && import.meta.env.MODE === "development"
+      ? "http://localhost:3001/api/options"
+      : "https://proyectoingsistemas-3.onrender.com/api/options";
+
   const handleLogout = () => {
     alert("You are now logged out!");
     logOutUser();
@@ -21,7 +31,9 @@ export function useOptionsMenu({ logOutUser, username, token, navigate }) {
     );
     if (confirmDelete) {
       axios
-        .delete(`http://localhost:3001/api/options/${username}`)
+        .delete(`${OPTIONS_URL}/${username}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then(() => {
           alert("Your account has been deleted.");
           logOutUser();
@@ -44,7 +56,7 @@ export function useOptionsMenu({ logOutUser, username, token, navigate }) {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/auth/changePassword",
+        `${API_URL}/changePassword`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );

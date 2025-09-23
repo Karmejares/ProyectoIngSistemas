@@ -10,6 +10,11 @@ export default function useGoals() {
   const error = useSelector((state) => state.goals.error);
   const [localError, setLocalError] = useState(null);
 
+  const API_URL =
+    import.meta.env && import.meta.env.MODE === "development"
+      ? "http://localhost:3001/api/goals"
+      : "https://proyectoingsistemas-3.onrender.com/api/goals";
+
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchGoals()).catch((err) => {
@@ -34,7 +39,7 @@ export default function useGoals() {
 
     try {
       const response = await axios.put(
-        `http://localhost:3001/api/goals/${goalId}/toggle`,
+        `${API_URL}${goalId}/toggle`,
         { date: today },
         {
           headers: {
