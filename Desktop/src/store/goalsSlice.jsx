@@ -29,7 +29,6 @@ export const fetchGoals = createAsyncThunk(
   }
 );
 
-// 🔄 Add goal to backend
 export const addGoal = createAsyncThunk(
   "goals/addGoal",
   async ({ title, description, plan }, { getState, rejectWithValue }) => {
@@ -53,14 +52,13 @@ export const addGoal = createAsyncThunk(
   }
 );
 
-// 🔄 Update step date in backend
 export const updateStepDate = createAsyncThunk(
   "goals/updateStepDate",
   async ({ goalId, stepId, date }, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     try {
       const response = await axios.patch(
-        `${API_URL}${goalId}/plan/step/${stepId}`,
+        `${API_URL}/${goalId}/plan/step/${stepId}`,
         { date },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -79,7 +77,7 @@ export const removeGoal = createAsyncThunk(
   async (goalId, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     try {
-      const response = await axios.delete(`${API_URL}${goalId}`, {
+      const response = await axios.delete(`${API_URL}/${goalId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -93,14 +91,13 @@ export const removeGoal = createAsyncThunk(
   }
 );
 
-// 🔄 Update goal on backend
 export const updateGoal = createAsyncThunk(
   "goals/updateGoal",
   async ({ _id, title, description, plan }, { getState, rejectWithValue }) => {
     const token = getToken(getState);
     try {
       const response = await axios.put(
-        `${API_URL}${_id}`,
+        `${API_URL}/${_id}`,
         { title, description, plan },
         {
           headers: {

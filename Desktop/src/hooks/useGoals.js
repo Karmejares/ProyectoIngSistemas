@@ -39,7 +39,7 @@ export default function useGoals() {
 
     try {
       const response = await axios.put(
-        `${API_URL}${goalId}/toggle`,
+        `${API_URL}/${goalId}/toggle`,
         { date: today },
         {
           headers: {
