@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL =
-  import.meta.env && import.meta.env.MODE === "production"
+  import.meta.env && import.meta.env.MODE === "development"
     ? "http://localhost:3001/api/auth"
     : "https://proyectoingsistemas-3.onrender.com/api/auth";
 export const fetchCoins = createAsyncThunk(
