@@ -104,7 +104,7 @@ function Application() {
           sx={{
             position: "absolute",
             top: 40,
-            right: 40,
+            right: 60,
             fontSize: "1.2rem",
             backgroundColor: "#ffd54f", // Gold
             color: "#000", // For contrast
