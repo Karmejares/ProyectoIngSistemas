@@ -51,14 +51,13 @@ export const addGoal = createAsyncThunk(
   }
 );
 
-// Update step date in backend
 export const updateStepDate = createAsyncThunk(
   "goals/updateStepDate",
   async ({ goalId, stepId, date }, { getState, rejectWithValue }) => {
     const token = await getToken(getState);
     try {
       const response = await fetch(
-        `http://localhost:3001/api/goals/${goalId}/plan/step/${stepId}`,
+        `s${goalId}/plan/step/${stepId}`,
         {
           method: "PATCH",
           headers: {

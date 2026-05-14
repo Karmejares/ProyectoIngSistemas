@@ -2,22 +2,12 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const authMiddleware = require("../middleware/authMiddleware");
-const User = require("../models/User"); // <-- This was missing
+const User = require("../models/User");
 
-/**
- * ✅ Register (Sign Up)
- */
 router.post("/signup", userController.registerUser);
 
-/**
- * ✅ Login
- */
 router.post("/login", userController.loginUser);
 
-/**
- * ✅ Get Profile (Protected Route)
- * Fetches the user's profile information.
- */
 router.get("/profile", authMiddleware, async (req, res) => {
   try {
     // 🔎 Find the user by ID, which is set in the middleware
@@ -41,33 +31,14 @@ router.get("/profile", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * ✅ Update Coins (Protected Route)
- * Expects: { coins: number }
- */
 router.post("/updateCoins", authMiddleware, userController.updateCoins);
 
-/**
- * ✅ Update Time Limit (Protected Route)
- * Expects: { timeLimit: number }
- */
 router.post("/updateTimeLimit", authMiddleware, userController.updateTimeLimit);
 
-/**
- * ✅ Update Privacy Settings (Protected Route)
- * Expects: { privacy: boolean }
- */
 router.post("/updatePrivacy", authMiddleware, userController.updatePrivacy);
 
-/**
- * ✅ Change Password (Protected Route)
- * Expects: { currentPassword: string, newPassword: string }
- */
 router.post("/changePassword", authMiddleware, userController.changePassword);
 
-/**
- * ✅ Delete Account (Protected Route)
- */
 router.delete("/deleteAccount", authMiddleware, userController.deleteAccount);
 
 module.exports = router;

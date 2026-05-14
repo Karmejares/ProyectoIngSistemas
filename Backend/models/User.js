@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const StepSchema = new mongoose.Schema({
   stepDescription: { type: String, required: true },
-  date: { type: Date, default: null }, // Se marcará cuando se cumpla el paso
+  date: { type: Date, default: null },
 });
 
 const GoalSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
-  plan: { type: [StepSchema], default: [] }, // Cambiado aquí
+  plan: { type: [StepSchema], default: [] },
   history: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now },
 });
@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-    goals: [GoalSchema], // Usamos GoalSchema como subdocumento
+    goals: [GoalSchema],
     lastFed: { type: Date, default: Date.now },
   },
   {

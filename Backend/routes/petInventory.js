@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// ✅ Get the food inventory
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -16,7 +15,6 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Add food to the inventory
 router.post("/add", authMiddleware, async (req, res) => {
   console.log("➡️ Route /add hit");
   const { foodItem } = req.body;
@@ -40,7 +38,6 @@ router.post("/add", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Remove food from the inventory
 router.post("/remove", authMiddleware, async (req, res) => {
   const { foodItem } = req.body;
 

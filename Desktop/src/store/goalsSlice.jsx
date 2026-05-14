@@ -157,6 +157,13 @@ const goalsSlice = createSlice({
       })
       .addCase(removeGoal.fulfilled, (state, action) => {
         state.items = state.items.filter((goal) => goal._id !== action.payload);
+      })
+      .addCase(updateStepDate.fulfilled, (state, action) => {
+        const updatedGoal = action.payload;
+        const index = state.items.findIndex((g) => g._id === updatedGoal._id);
+        if (index !== -1) {
+          state.items[index] = updatedGoal;
+        }
       });
   },
 });
