@@ -1,22 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { removeGoal, updateStepDate } from "../store/goalsSlice";
+
+const STORAGE_KEY = "completedSteps";
+
+const loadFromStorage = () => {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+};
+
+const saveToStorage = (steps) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(steps));
+};
 
 export const useGoalDetails = ({ goalId, onClose }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
-  const [optimisticSteps, setOptimisticSteps] = useState({});
+  const [optimisticSteps, setOptimisticSteps] = useState(loadFromStorage);
 
   const goals = useSelector((state) => state.goals.items);
   const goal = goals.find((g) => g._id === goalId);
 
+  // sincronizar steps confirmados por backend → limpiar localStorage
+  useEffect(() => {
+    if (!goal?.plan) return;
+    const confirmed = goal.plan
+      .filter((s) => s.date)
+      .reduce((acc, s) => ({ ...acc, [s._id]: s.date }), {});
+
+    setOptimisticSteps((prev) => {
+      const merged = { ...prev };
+      Object.keys(confirmed).forEach((id) => {
+        delete merged[id];
+      });
+      saveToStorage(merged);
+      return merged;
+    });
+  }, [goal]);
+
   const handleCheckboxClick = async (stepId) => {
     const date = new Date().toISOString();
 
-    // marcar localmente
-    setOptimisticSteps((prev) => ({ ...prev, [stepId]: date }));
+    setOptimisticSteps((prev) => {
+      const next = { ...prev, [stepId]: date };
+      saveToStorage(next);
+      return next;
+    });
 
     try {
       await dispatch(
@@ -26,11 +60,11 @@ export const useGoalDetails = ({ goalId, onClose }) => {
     } catch (error) {
       console.error("Failed to update step date:", error);
       alert("Failed to mark step as complete.");
-      // rollback
       setOptimisticSteps((prev) => {
-        const newState = { ...prev };
-        delete newState[stepId];
-        return newState;
+        const next = { ...prev };
+        delete next[stepId];
+        saveToStorage(next);
+        return next;
       });
     }
   };
